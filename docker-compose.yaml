@@ -1,0 +1,14 @@
+services:
+  api:
+    profiles: ["api"]
+    container_name: litestar.api
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "${API_PORT}:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app
