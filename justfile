@@ -3,7 +3,6 @@ EXEC := "docker exec -it"
 LOGS := "docker logs"
 ENV := "--env-file .env"
 APP_FILE := "docker_compose/app.yaml"
-APP_CONTAINER := "fastapi"
 
 # Show help message
 help:

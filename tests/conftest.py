@@ -1,11 +1,11 @@
-from collections.abc import Iterator
-from typing import TYPE_CHECKING
-
 import pytest
 from litestar import Litestar
 from litestar.testing import TestClient
 
-from src.app import app
+from collections.abc import Iterator
+from typing import TYPE_CHECKING
+
+from src.presentation.api.main import app
 
 if TYPE_CHECKING:
     from litestar import Litestar
