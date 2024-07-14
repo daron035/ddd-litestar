@@ -1,5 +1,8 @@
 from abc import ABC
-from dataclasses import dataclass, field
+from dataclasses import (
+    dataclass,
+    field,
+)
 
 from src.domain.common.events.event import Event
 

@@ -1,4 +1,7 @@
-from dataclasses import dataclass, field
+from dataclasses import (
+    dataclass,
+    field,
+)
 from typing import Self
 
 from src.domain.common.entities.aggregate_root import AggregateRoot
@@ -6,8 +9,15 @@ from src.domain.user.events import FullNameUpdated
 from src.domain.user.events.user_created import UserCreated
 from src.domain.user.events.user_deleted import UserDeleted
 from src.domain.user.events.username_updated import UsernameUpdated
-from src.domain.user.exceptions import UserIsDeletedError, UsernameAlreadyExistsError
-from src.domain.user.value_objects import FullName, UserId, Username
+from src.domain.user.exceptions import (
+    UserIsDeletedError,
+    UsernameAlreadyExistsError,
+)
+from src.domain.user.value_objects import (
+    FullName,
+    UserId,
+    Username,
+)
 from src.domain.user.value_objects.deleted_status import DeletionTime
 
 

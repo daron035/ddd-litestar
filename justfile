@@ -8,6 +8,10 @@ APP_FILE := "docker_compose/app.yaml"
 help:
     just -l
 
+# Litestar run
+run:
+  uvicorn src.presentation.api.main:create_app --reload
+
 # Install package with dependencies
 install:
 	poetry install --with dev,test,lint --no-root
@@ -19,6 +23,10 @@ lint:
 # Run tests
 test *args:
   just _py pytest {{args}}
+
+# Run test coverage
+cov:
+  just _py pytest --cov=src tests
 
 # Up container
 up:

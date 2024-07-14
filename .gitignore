@@ -8,6 +8,6 @@ __pycache__/
 .python-version
 *.pyc
 *.sqlite*
-.coverage
+.coverage*
 pytestdebug.log
 .pytest_cache/

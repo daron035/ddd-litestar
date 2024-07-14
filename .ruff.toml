@@ -1,6 +1,9 @@
 target-version = "py312"
 line-length = 120
 
+[format]
+skip-magic-trailing-comma = false
+
 [lint]
 select = ["ALL"]
 exclude = [
@@ -57,6 +60,20 @@ ignore = [
 
 [lint.isort]
 combine-as-imports = true
+lines-after-imports = 2
+
+[lint.isort.sections]
+litestar = ["litestar", "starlette"]
+known-first-party = ["src", "tests"]
+sections = [
+    "future",
+    "standard-library",
+    "third-party",
+    "litestar",
+    "first-party",
+    "local-folder",
+    "testing"
+]
 
 [lint.mccabe]
 max-complexity = 12

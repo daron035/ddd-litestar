@@ -3,6 +3,7 @@ from .user_created import UserCreated
 from .user_deleted import UserDeleted
 from .username_updated import UsernameUpdated
 
+
 __all__ = (
     "UserCreated",
     "UserDeleted",

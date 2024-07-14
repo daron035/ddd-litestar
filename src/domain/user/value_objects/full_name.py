@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from src.domain.common.exceptions import DomainError
 from src.domain.common.value_objects.base import BaseValueObject
 
+
 MAX_NAME_LENGTH = 32
 NAME_PATTERN = re.compile(r"[A-Za-z]+")
 

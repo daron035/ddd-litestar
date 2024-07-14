@@ -1,17 +1,21 @@
-import pytest
-from litestar import Litestar
-from litestar.testing import TestClient
+from injector import Injector
+from pytest import fixture
 
-from collections.abc import Iterator
-from typing import TYPE_CHECKING
-
-from src.presentation.api.main import app
-
-if TYPE_CHECKING:
-    from litestar import Litestar
+from src.application.common.mediator.base import Mediator
+from src.infrastructure.ioc import AppModule
+from src.infrastructure.repositories.messages.base import BaseChatRepository
 
 
-@pytest.fixture(scope="function")
-def test_client() -> Iterator[TestClient[Litestar]]:
-    with TestClient(app=app) as client:
-        yield client
+@fixture(scope="function")
+def container() -> Injector:
+    return Injector(AppModule)
+
+
+@fixture()
+def mediator(container: Injector) -> Mediator:
+    return container.get(Mediator)
+
+
+@fixture()
+def chat_repository(container: Injector) -> BaseChatRepository:
+    return container.get(BaseChatRepository)
