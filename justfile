@@ -3,11 +3,14 @@ EXEC := "docker exec -it"
 LOGS := "docker logs"
 ENV := "--env-file .env"
 APP_FILE := "docker_compose/app.yaml"
-APP_CONTAINER := "fastapi"
 
 # Show help message
 help:
     just -l
+
+# Litestar run
+run:
+  uvicorn src.presentation.api.main:create_app --reload
 
 # Install package with dependencies
 install:
@@ -20,6 +23,10 @@ lint:
 # Run tests
 test *args:
   just _py pytest {{args}}
+
+# Run test coverage
+cov:
+  just _py pytest --cov=src tests
 
 # Up container
 up:

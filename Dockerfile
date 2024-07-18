@@ -33,6 +33,6 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY ./app /app
+COPY ./src /app
 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "presentation.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
