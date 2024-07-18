@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "ddd-litestar"
+name = "dddlitestar"
 version = "0.1.0"
 description = ""
 authors = ["daron035 <kamil249@mail.ru>"]

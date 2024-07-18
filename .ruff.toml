@@ -20,6 +20,7 @@ exclude = [
     "benchmarks",
     "tests/*",
 ]
+
 ignore = [
     "A003", # Python builtin is shadowed by class attribute {name} from {row}
     "B008", # Do not perform function call {name} in argument defaults
@@ -58,13 +59,18 @@ ignore = [
     "COM812", # Explicitly concatenated string should be implicitly concatenated
 ]
 
+[lint.flake8-annotations]
+mypy-init-return = true
+
 [lint.isort]
 combine-as-imports = true
+force-wrap-aliases = true
 lines-after-imports = 2
+lines-between-types = 1
 
 [lint.isort.sections]
 litestar = ["litestar", "starlette"]
-known-first-party = ["src", "tests"]
+first-party = ["src", "tests"]
 sections = [
     "future",
     "standard-library",

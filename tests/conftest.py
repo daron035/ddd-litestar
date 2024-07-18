@@ -1,8 +1,8 @@
 from injector import Injector
 from pytest import fixture
 
-from src.application.common.mediator.base import Mediator
 from src.infrastructure.ioc import AppModule
+from src.infrastructure.mediator.mediator import MediatorImpl
 from src.infrastructure.repositories.messages.base import BaseChatRepository
 
 
@@ -12,8 +12,8 @@ def container() -> Injector:
 
 
 @fixture()
-def mediator(container: Injector) -> Mediator:
-    return container.get(Mediator)
+def mediator(container: Injector) -> MediatorImpl:
+    return container.get(MediatorImpl)
 
 
 @fixture()

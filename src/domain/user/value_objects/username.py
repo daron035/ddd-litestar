@@ -1,4 +1,5 @@
 import re
+
 from dataclasses import dataclass
 
 from src.domain.common.exceptions import DomainError
