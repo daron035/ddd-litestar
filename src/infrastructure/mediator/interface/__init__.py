@@ -1,10 +1,11 @@
 from .dispatchers.command import CommandDispatcher
-from .dispatchers.request import Dispatcher
 from .dispatchers.query import QueryDispatcher
-from .observers.event import EventObserver, Listener
-from .mediator import CommandMediator, EventMediator, Mediator, QueryMediator
-from .entities import Command, Query, Request, Event
+from .dispatchers.request import Dispatcher
+from .entities import Command, Event, Query, Request
 from .handlers import CommandHandler, EventHandler, Handler, QueryHandler
+from .mediator import CommandMediator, EventMediator, Mediator, QueryMediator
+from .observers.event import EventObserver, Listener
+
 
 __all__ = (
     "Mediator",

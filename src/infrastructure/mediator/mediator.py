@@ -27,7 +27,8 @@ class MediatorImpl(Mediator):
         command_dispatcher: CommandDispatcher | None = None,
         query_dispatcher: QueryDispatcher | None = None,
         event_observer: EventObserver | None = None,
-        *, extra_data: dict[str, Any] | None = None,
+        *,
+        extra_data: dict[str, Any] | None = None,
     ):
         if command_dispatcher is None:
             command_dispatcher = CommandDispatcherImpl()
@@ -50,8 +51,6 @@ class MediatorImpl(Mediator):
 
     def unbind(self, *keys: str) -> None:
         pass
-
-
 
     def register_command_handler(self, command: type[C], handler: CommandHandlerType[C, CRes]) -> None:
         self._command_dispatcher.register_handler(command, handler)

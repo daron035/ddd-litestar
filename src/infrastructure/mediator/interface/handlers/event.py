@@ -1,8 +1,8 @@
 import abc
+
 from collections.abc import Awaitable, Callable
 from typing import Any, Generic, TypeVar
 
-# from src.application.common.mediator.interface.entities import Event
 from src.infrastructure.mediator.interface.entities.event import Event
 
 from .request import Handler

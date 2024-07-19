@@ -1,4 +1,5 @@
 import functools
+
 from collections.abc import Awaitable, Callable, Sequence
 from typing import Any, TypeVar
 
@@ -30,7 +31,7 @@ class Middleware:
         if isinstance(handler, type):
             handler = handler()
 
-        return await handler(request, *args, **kwargs) # type: ignore
+        return await handler(request, *args, **kwargs)  # type: ignore
 
 
 MiddlewareType = Callable[[HandlerType[R, RRes], R], Awaitable[RRes]]
@@ -43,4 +44,4 @@ def wrap_middleware(
     for middleware in reversed(middlewares):
         handler = functools.partial(middleware, handler)
 
-    return handler # type: ignore
+    return handler  # type: ignore

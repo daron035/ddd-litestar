@@ -1,10 +1,9 @@
 import abc
+
 from collections.abc import Awaitable, Callable
 from typing import Any, Generic, TypeVar
 
 from src.infrastructure.mediator.interface.entities.query import Query
-
-# from src.application.common.mediator.interface.entities import Query
 
 from .request import Handler
 

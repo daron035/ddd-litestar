@@ -1,6 +1,7 @@
 from .command import CommandDispatcherImpl
-from .request import DispatcherImpl
 from .query import QueryDispatcherImpl
+from .request import DispatcherImpl
+
 
 __all__ = (
     "CommandDispatcherImpl",

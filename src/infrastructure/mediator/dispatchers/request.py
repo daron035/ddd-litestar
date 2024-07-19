@@ -1,18 +1,13 @@
 import abc
+
 from collections.abc import Awaitable, Callable, Sequence
 from typing import Any, TypeVar
 
 from src.infrastructure.mediator.interface.dispatchers.request import Dispatcher
 from src.infrastructure.mediator.interface.entities.request import Request
-from src.infrastructure.mediator.interface.exceptions import HandlerNotFound
+from src.infrastructure.mediator.interface.exceptions import HandlerNotFoundError
 from src.infrastructure.mediator.interface.handlers.request import HandlerType
 from src.infrastructure.mediator.middlewares.base import Middleware, MiddlewareType, wrap_middleware
-
-# from src.application.common.mediator.interface.dispatchers import Dispatcher
-# from src.application.common.mediator.interface.entities import Request
-# from src.application.common.mediator.interface.exceptions import HandlerNotFound
-# from src.application.common.mediator.interface.handlers import HandlerType
-# from src.application.common.mediator.middlewares.base import Middleware, MiddlewareType, wrap_middleware
 
 
 Self = TypeVar("Self", bound="DispatcherImpl")
@@ -26,8 +21,10 @@ DEFAULT_MIDDLEWARES: tuple[MiddlewareType[Request[Any], Any], ...] = (Middleware
 
 class DispatcherImpl(Dispatcher, abc.ABC):
     def __init__(
-        self, middlewares: Middlewares = (),
-        *, handlers: Handlers | None = None,
+        self,
+        middlewares: Middlewares = (),
+        *,
+        handlers: Handlers | None = None,
     ) -> None:
         self._middlewares = middlewares
 
@@ -53,8 +50,9 @@ class DispatcherImpl(Dispatcher, abc.ABC):
         try:
             handler = self._handlers[type(request)]
         except KeyError as err:
-            raise HandlerNotFound(
-                f"Request handler for {type(request).__name__} request is not registered", request,
+            raise HandlerNotFoundError(
+                f"Request handler for {type(request).__name__} request is not registered",
+                request,
             ) from err
 
         # Handler has to be wrapped with at least one middleware to initialize the handler if it is necessary

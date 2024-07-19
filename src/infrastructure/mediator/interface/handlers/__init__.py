@@ -1,7 +1,8 @@
 from .command import CommandHandler, CommandHandlerType
 from .event import EventHandler, EventHandlerType
-from .request import Handler, HandlerType
 from .query import QueryHandler, QueryHandlerType
+from .request import Handler, HandlerType
+
 
 __all__ = (
     "Handler",

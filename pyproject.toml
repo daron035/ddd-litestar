@@ -13,6 +13,7 @@ uuid6 = "^2024.1.12"
 punq = "^0.7.0"
 pydantic = "^2.8.2"
 injector = "^0.22.0"
+adaptix = "^3.0.0b7"
 
 [tool.poetry.group.dev]
 optional = true
