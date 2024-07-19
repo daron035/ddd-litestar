@@ -16,7 +16,6 @@ services:
       - ./config:/app/config:ro
     environment:
       - CONFIG_PATH=${CONFIG_PATH:-./config/prod_config.toml}
-    command: uvicorn src.presentation.api.main:init_api --host 0.0.0.0 --port 8000 --reload
     healthcheck:
       test: ["CMD-SHELL", "curl -fsSL http://localhost:8000/healthcheck/"]
       interval: 10s
