@@ -34,4 +34,4 @@ async def get_book(book_id: int) -> dict[str, int]:
 
 @get(path="/healthcheck", media_type=MediaType.TEXT, sync_to_thread=False)
 def health_check() -> str:
-    return "343ss4sdds34s43"
+    return "healthy"

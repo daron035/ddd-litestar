@@ -6,7 +6,7 @@ from litestar.testing import AsyncTestClient
 
 
 async def test_health_check_with_fixture(test_client: AsyncTestClient[Litestar]) -> None:
-    response = await test_client.get("/health-check")
+    response = await test_client.get("/healthcheck")
     assert response.status_code == HTTP_200_OK
     assert response.text == "healthy"
 
