@@ -7,11 +7,6 @@ from src.infrastructure.mediator.interface.handlers.event import EventHandlerTyp
 from src.infrastructure.mediator.interface.observers.event import EventObserver, Listener
 from src.infrastructure.mediator.middlewares.base import MiddlewareType, wrap_middleware
 
-# from src.application.common.mediator.dispatchers.request import DEFAULT_MIDDLEWARES
-# from src.application.common.mediator.interface.observers.event import EventObserver, Listener
-# from src.application.common.mediator.interface.entities.event import Event
-# from src.application.common.mediator.interface.handlers.event import EventHandlerType
-# from src.application.common.mediator.middlewares.base import MiddlewareType, wrap_middleware
 
 Self = TypeVar("Self", bound="EventObserverImpl")
 E = TypeVar("E", bound=Event)
@@ -20,8 +15,10 @@ Middlewares = Sequence[MiddlewareType[Event, Any]]
 
 class EventObserverImpl(EventObserver):
     def __init__(
-        self, middlewares: Middlewares = (),
-        *, listeners: list[Listener[Event]] | None = None,
+        self,
+        middlewares: Middlewares = (),
+        *,
+        listeners: list[Listener[Event]] | None = None,
     ) -> None:
         self._middlewares: Middlewares = middlewares
 
@@ -47,7 +44,6 @@ class EventObserverImpl(EventObserver):
         await self._handle(events, *args, **kwargs)
 
     async def _handle(self, events: Sequence[Event], *args: Any, **kwargs: Any) -> None:
-        # Handler has to be wrapped with at least one middleware to initialize the handler if it is necessary
         middlewares: Middlewares = self._middlewares if self._middlewares else DEFAULT_MIDDLEWARES
 
         for event in events:

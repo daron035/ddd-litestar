@@ -1,7 +1,8 @@
 from .command import Command
 from .event import Event
-from .request import Request
 from .query import Query
+from .request import Request
+
 
 __all__ = (
     "Request",

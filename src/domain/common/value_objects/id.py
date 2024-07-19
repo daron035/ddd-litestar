@@ -1,8 +1,9 @@
 from dataclasses import dataclass, field
 from uuid import UUID
 
-from src.domain.common.value_objects.base import ValueObject
 from uuid6 import uuid7
+
+from src.domain.common.value_objects.base import ValueObject
 
 
 @dataclass(frozen=True)

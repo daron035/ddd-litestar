@@ -4,10 +4,6 @@ from src.infrastructure.mediator.interface.dispatchers.request import Dispatcher
 from src.infrastructure.mediator.interface.entities.command import Command
 from src.infrastructure.mediator.interface.handlers.command import CommandHandlerType
 
-# from src.application.common.mediator.interface.dispatchers.request import Dispatcher
-# from src.application.common.mediator.interface.entities import Command
-# from src.application.common.mediator.interface.handlers import CommandHandlerType
-
 
 C = TypeVar("C", bound=Command[Any])
 CRes = TypeVar("CRes")

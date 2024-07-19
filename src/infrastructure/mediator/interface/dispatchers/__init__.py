@@ -1,6 +1,7 @@
 from .command import CommandDispatcher
-from .request import Dispatcher
 from .query import QueryDispatcher
+from .request import Dispatcher
+
 
 __all__ = (
     "Dispatcher",

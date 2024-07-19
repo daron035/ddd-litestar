@@ -26,6 +26,7 @@ RUN pip install --no-cache-dir --upgrade pip==24.1.1 \
 
 RUN poetry install --no-dev
 
+
 FROM python-base AS development
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 RUN apt-get update \
@@ -33,6 +34,20 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY ./src /app
+COPY ./src /app/src
 
-CMD ["uvicorn", "presentation.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+EXPOSE 8000
+CMD ["uvicorn", "src.presentation.api.main:init_api", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+
+FROM python-base AS production
+COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY ./src /app/src
+
+EXPOSE 8000
+CMD ["python", "-Om", "src"]

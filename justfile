@@ -3,14 +3,19 @@ EXEC := "docker exec -it"
 LOGS := "docker logs"
 ENV := "--env-file .env"
 APP_FILE := "docker_compose/app.yaml"
+package_dir := "src"
 
 # Show help message
 help:
     just -l
 
-# Litestar run
-run:
-  uvicorn src.presentation.api.main:create_app --reload
+# # Litestar run
+# run:
+#   $(py) python -m {{package_dir}}
+
+# Litestar run dev
+dev:
+  uvicorn src.presentation.api.main:init_api --reload
 
 # Install package with dependencies
 install:
@@ -37,4 +42,4 @@ down:
   docker compose --profile api down
 
 _py *args:
-    poetry run {{args}}
+  poetry run {{args}}
