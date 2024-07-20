@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING, AsyncIterator
 from litestar import Litestar
 from litestar.testing import AsyncTestClient
 
-from src.presentation.api.main import create_app
+from src.presentation.api.main import init_api
+
 
 if TYPE_CHECKING:
     from litestar import Litestar
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
 
 @fixture
 def app() -> Litestar:
-    app = create_app()
+    app = init_api()
     # app.dependency_overrides[init_container] = init_dummy_container
 
     return app
@@ -21,5 +22,5 @@ def app() -> Litestar:
 
 @fixture(scope="function")
 async def test_client() -> AsyncIterator[AsyncTestClient[Litestar]]:
-    async with AsyncTestClient(app=create_app()) as client:
+    async with AsyncTestClient(app=init_api()) as client:
         yield client

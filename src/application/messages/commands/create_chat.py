@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 
 from src.application.messages.exceptions import ChatWithThatTitleAlreadyExistsError
+from src.application.messages.interfaces.percistence.chat import ChatRepo
 from src.domain.common.entities.entity import Entity
 from src.domain.messages.entities.messages import Chat
 from src.domain.messages.value_objects import Title
 from src.infrastructure.mediator.interface.entities.command import Command
 from src.infrastructure.mediator.interface.handlers.command import CommandHandler
-from src.infrastructure.repositories.messages.base import BaseChatRepository
 
 
 @dataclass(frozen=True)
@@ -16,7 +16,7 @@ class CreateChat(Command[Chat]):
 
 @dataclass(frozen=True)
 class CreateChatHandler(CommandHandler[CreateChat, Entity]):
-    chat_repository: BaseChatRepository
+    chat_repository: ChatRepo
 
     async def __call__(self, command: CreateChat) -> Entity:
         if await self.chat_repository.check_chat_exists_by_title(command.title):

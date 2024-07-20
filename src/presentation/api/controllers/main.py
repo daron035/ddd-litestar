@@ -14,6 +14,19 @@ from src.infrastructure.ioc import init_container
 from src.infrastructure.mediator.mediator import MediatorImpl
 
 
+# @post(
+#     path="/",
+#     description="Endpoint creates a new chat room, if a chat room with that name exists, a 400 error is returned",
+#     dependencies={"container": Provide(punq_container, sync_to_thread=False)},
+#     status_code=status_codes.HTTP_201_CREATED,
+# )
+# async def index(data: CreateChat, container: Container) -> Any:
+#     mediator = container.resolve(MediatorImpl)
+
+#     chat = await mediator.send(data)
+#     return chat
+
+
 @post(
     path="/",
     description="Endpoint creates a new chat room, if a chat room with that name exists, a 400 error is returned",
@@ -34,4 +47,4 @@ async def get_book(book_id: int) -> dict[str, int]:
 
 @get(path="/healthcheck", media_type=MediaType.TEXT, sync_to_thread=False)
 def health_check() -> str:
-    return "343ss4sdds34s43"
+    return "healthy"

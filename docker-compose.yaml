@@ -1,6 +1,7 @@
 services:
+
   api:
-    profiles: ["api"]
+    profiles: [ "api" ]
     container_name: litestar.api
     build:
       context: .
@@ -14,12 +15,47 @@ services:
     volumes:
       - ./src:/app/src
       - ./config:/app/config:ro
+    networks:
+      - litestar.mongo.network
     environment:
       - CONFIG_PATH=${CONFIG_PATH:-./config/prod_config.toml}
-    command: uvicorn src.presentation.api.main:init_api --host 0.0.0.0 --port 8000 --reload
     healthcheck:
       test: ["CMD-SHELL", "curl -fsSL http://localhost:8000/healthcheck/"]
       interval: 10s
       timeout: 60s
       retries: 5
       start_period: 10s
+
+  mongodb:
+    profiles: [ "api" ]
+    container_name: litestar.mongodb
+    image: mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - litestar.mongodb.data:/data/db
+    networks:
+      - litestar.mongo.network
+
+  mongo-express:
+    profiles: [ "api" ]
+    container_name: litestar.mongo-express
+    image: mongo-express
+    restart: unless-stopped
+    ports:
+      - "28081:8081"
+    networks:
+      - litestar.mongo.network
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_DB_ADMIN_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_DB_ADMIN_PASSWORD}
+      ME_CONFIG_MONGODB_URL: ${MONGO_DB_CONNECTION_URI}
+    depends_on:
+       - mongodb
+
+volumes:
+  litestar.mongodb.data: {}
+
+networks:
+  litestar.mongo.network: {}

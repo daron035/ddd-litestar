@@ -9,12 +9,9 @@ package_dir := "src"
 help:
     just -l
 
-# # Litestar run
-# run:
-#   $(py) python -m {{package_dir}}
-
-# Litestar run dev
-dev:
+# Litestar run
+run:
+  # $(py) python -m {{package_dir}}
   uvicorn src.presentation.api.main:init_api --reload
 
 # Install package with dependencies
