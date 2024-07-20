@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 
+from src.infrastructure.mongo.config import MongoConfig
+
 
 @dataclass
 class APIConfig:
@@ -11,3 +13,4 @@ class APIConfig:
 @dataclass
 class Config:
     api: APIConfig = field(default_factory=APIConfig)
+    mongo: MongoConfig = field(default_factory=MongoConfig)

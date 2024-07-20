@@ -14,6 +14,7 @@ punq = "^0.7.0"
 pydantic = "^2.8.2"
 injector = "^0.22.0"
 adaptix = "^3.0.0b7"
+motor = "^3.5.1"
 
 [tool.poetry.group.dev]
 optional = true
