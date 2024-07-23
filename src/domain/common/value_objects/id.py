@@ -8,4 +8,4 @@ from src.domain.common.value_objects.base import ValueObject
 
 @dataclass(frozen=True)
 class Id(ValueObject[UUID]):
-    value: UUID = field(init=False, kw_only=True, default_factory=uuid7)
+    value: UUID = field(default_factory=uuid7)

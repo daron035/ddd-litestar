@@ -1,3 +1,4 @@
+# ruff: noqa
 from functools import lru_cache
 
 from motor.motor_asyncio import AsyncIOMotorClient

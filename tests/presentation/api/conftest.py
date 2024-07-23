@@ -15,7 +15,6 @@ if TYPE_CHECKING:
 @fixture
 def app() -> Litestar:
     app = init_api()
-    # app.dependency_overrides[init_container] = init_dummy_container
 
     return app
 

@@ -3,11 +3,11 @@ import uvicorn
 from litestar import Litestar
 
 from src.presentation.api.config import APIConfig
-from src.presentation.api.controllers.main import get_book, health_check, index
+from src.presentation.api.controllers.main import create_message, get_book, health_check, index
 
 
 def init_api(debug: bool = __debug__) -> Litestar:
-    app = Litestar(route_handlers=[index, get_book, health_check], debug=debug)
+    app = Litestar(route_handlers=[index, get_book, health_check, create_message], debug=debug)
     return app
 
 

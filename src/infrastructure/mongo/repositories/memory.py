@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from uuid import UUID
 
 from src.application.messages.interfaces.percistence import ChatRepo
 from src.domain.messages.entities.messages import Chat
@@ -16,3 +17,6 @@ class MemoryChatRepoImpl(ChatRepo):
 
     async def add_chat(self, chat: Chat) -> None:
         self._saved_chats.append(chat)
+
+    async def get_chat_by_id(self, chat_id: UUID) -> Chat | None:
+        pass
