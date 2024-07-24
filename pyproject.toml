@@ -15,6 +15,8 @@ pydantic = "^2.8.2"
 injector = "^0.22.0"
 adaptix = "^3.0.0b7"
 motor = "^3.5.1"
+aiokafka = "^0.11.0"
+orjson = "^3.10.6"
 
 [tool.poetry.group.dev]
 optional = true

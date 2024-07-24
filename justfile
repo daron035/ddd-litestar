@@ -38,5 +38,17 @@ up:
 down:
   docker compose --profile api down
 
+# Up all container
+all:
+  docker compose --profile api up --build -d
+
+# App logs
+logs:
+  docker logs -f litestar.api
+
+# Kafka logs
+messaging-logs:
+  docker compose --profile kafka logs -f
+
 _py *args:
   poetry run {{args}}
