@@ -7,7 +7,10 @@ from src.presentation.api.controllers.main import create_message, get_book, heal
 
 
 def init_api(debug: bool = __debug__) -> Litestar:
-    app = Litestar(route_handlers=[index, get_book, health_check, create_message], debug=debug)
+    app = Litestar(
+        route_handlers=[index, get_book, health_check, create_message],
+        debug=debug,
+    )
     return app
 
 

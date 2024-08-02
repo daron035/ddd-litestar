@@ -1,7 +1,6 @@
 from typing import Any
 from uuid import UUID
 
-from injector import Injector
 from litestar import (
     MediaType,
     get,
@@ -9,10 +8,11 @@ from litestar import (
     status_codes,
 )
 from litestar.di import Provide
+from punq import Container
 
 from src.application.messages.commands.create_chat import CreateChat
 from src.application.messages.commands.create_message import CreateMessage
-from src.infrastructure.ioc import init_container
+from src.infrastructure.containers import init_container
 from src.infrastructure.mediator.mediator import MediatorImpl
 
 
@@ -22,8 +22,8 @@ from src.infrastructure.mediator.mediator import MediatorImpl
     dependencies={"container": Provide(init_container, sync_to_thread=False)},
     status_code=status_codes.HTTP_201_CREATED,
 )
-async def index(data: CreateChat, container: Injector) -> Any:
-    mediator = container.get(MediatorImpl)
+async def index(data: CreateChat, container: Container) -> Any:
+    mediator: MediatorImpl = container.resolve(MediatorImpl)
 
     chat = await mediator.send(data)
     return chat
@@ -35,8 +35,8 @@ async def index(data: CreateChat, container: Injector) -> Any:
     dependencies={"container": Provide(init_container, sync_to_thread=False)},
     status_code=status_codes.HTTP_201_CREATED,
 )
-async def create_message(data: str, chat_id: UUID, container: Injector) -> Any:
-    mediator = container.get(MediatorImpl)
+async def create_message(data: str, chat_id: UUID, container: Container) -> Any:
+    mediator: MediatorImpl = container.resolve(MediatorImpl)
 
     message = await mediator.send(CreateMessage(text=data, chat_id=chat_id))
     return message

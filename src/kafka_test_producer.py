@@ -1,5 +1,3 @@
-import asyncio
-
 from aiokafka import AIOKafkaProducer
 
 
@@ -9,9 +7,14 @@ async def send_one():
     await producer.start()
     try:
         # Produce message
-        await producer.send_and_wait("test-topic", b"Super-pooper message")
+        await producer.send_and_wait(
+            topic="test-topic",
+            key=b"Yeey",
+            value=b"Super-pooper message",
+            headers=[("adsfasd", b"asdfsad")],
+        )
     finally:
         await producer.stop()
 
 
-asyncio.run(send_one())
+# asyncio.run(send_one())
