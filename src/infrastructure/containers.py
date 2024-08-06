@@ -10,6 +10,7 @@ from src.application.messages.interfaces.percistence.chat import ChatRepo
 from src.application.messages.interfaces.percistence.message import MessageRepo
 from src.domain.common.events.event import Event
 from src.infrastructure.config_loader import load_config
+from src.infrastructure.event_bus.event_bus import EventBusImpl
 from src.infrastructure.event_bus.event_handler import EventHandlerPublisher
 from src.infrastructure.mediator.mediator import MediatorImpl
 from src.infrastructure.message_broker.interface import MessageBroker
@@ -29,6 +30,7 @@ def init_container() -> Container:
     # Регистрация зависимостей
     container.register(Config, instance=_config, scope=Scope.singleton)
     container.register(MessageBroker, factory=lambda: _init_kafka(container), scope=Scope.singleton)
+    container.register(EventBusImpl, factory=lambda: _init_event_bus(container), scope=Scope.singleton)
     container.register(ChatRepo, factory=lambda: _init_chat_mongodb_repository(container), scope=Scope.singleton)
     container.register(MessageRepo, factory=lambda: _init_message_mongodb_repository(container), scope=Scope.singleton)
     container.register(MediatorImpl, factory=lambda: _init_mediator(container))
@@ -59,8 +61,14 @@ def _init_mediator(container: Container) -> MediatorImpl:
 
 
 def _init_event_handler(container: Container) -> EventHandlerPublisher:
+    event_bus: EventBusImpl = container.resolve(EventBusImpl)
+
+    return EventHandlerPublisher(_event_bus=event_bus)
+
+
+def _init_event_bus(container: Container) -> EventBusImpl:
     message_broker: MessageBroker = container.resolve(MessageBroker)
-    return EventHandlerPublisher(message_broker=message_broker)
+    return EventBusImpl(_message_broker=message_broker)
 
 
 def _init_chat_mongodb_repository(container: Container) -> MongoDBChatRepoImpl:
