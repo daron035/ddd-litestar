@@ -3,6 +3,11 @@ host = "127.0.0.1"
 port = 8000
 debug = true
 
+[mongo]
+mongodb_connection_uri = "mongodb://mongodb:27017"
+mongodb_chat_database = "chat"
+mongodb_chat_collection = "chat"
+
 [db]
 host = "localhost"
 port = 5432
@@ -12,12 +17,9 @@ password = "admin"
 echo = true
 
 [event_bus]
-host = "localhost"
-port = 5672
-login = "admin"
-password = "admin"
+bootstrap_servers = "kafka:29092"
+metadata_max_age_ms = 30000
 
 [logging]
 level = "DEBUG"
 render_json_logs = false
-#path = "./logs/logs.log"

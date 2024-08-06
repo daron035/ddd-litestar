@@ -16,13 +16,13 @@ ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
 FROM python-base AS builder-base
 RUN apt-get update \
- && apt-get install -y --no-install-recommends gcc git
+    && apt-get install -y --no-install-recommends gcc git
 
 WORKDIR $PYSETUP_PATH
 COPY ./pyproject.toml ./poetry.lock ./
 RUN pip install --no-cache-dir --upgrade pip==24.1.1 \
- && pip install --no-cache-dir setuptools==70.2.0 wheel==0.43.0 \
- && pip install --no-cache-dir poetry==1.8.3
+    && pip install --no-cache-dir setuptools==70.2.0 wheel==0.43.0 \
+    && pip install --no-cache-dir poetry==1.8.3
 
 RUN poetry install --no-dev
 
@@ -30,8 +30,8 @@ RUN poetry install --no-dev
 FROM python-base AS development
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 RUN apt-get update \
- && apt-get install -y --no-install-recommends curl \
- && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY ./src /app/src
@@ -43,8 +43,8 @@ CMD ["uvicorn", "src.presentation.api.main:init_api", "--host", "0.0.0.0", "--po
 FROM python-base AS production
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 RUN apt-get update \
- && apt-get install -y --no-install-recommends curl \
- && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY ./src /app/src

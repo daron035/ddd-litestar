@@ -1,11 +1,10 @@
-from abc import ABC
 from dataclasses import dataclass
 
 from motor.core import AgnosticClient, AgnosticCollection
 
 
 @dataclass
-class MongoRepo(ABC):
+class MongoRepo:
     mongo_client: AgnosticClient
     mongo_db_name: str
     mongo_collection_name: str
