@@ -98,7 +98,6 @@ def _init_kafka(container: Container) -> KafkaMessageBroker:
         "test-topic",
         bootstrap_servers=config.event_bus.bootstrap_servers,
         group_id="chat",
-        # group_id=f"chats-{uuid4()}",
         metadata_max_age_ms=30000,
     )
     return KafkaMessageBroker(producer=_producer, consumer=_consumer)

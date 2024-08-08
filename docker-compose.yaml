@@ -91,9 +91,9 @@ services:
       - litestar.kafka.network
     healthcheck:
       test: nc -z localhost 29092
-      interval: 10s
-      timeout: 10s
-      retries: 10
+      # interval: 10s
+      # timeout: 10s
+      # retries: 10
     # healthcheck:
     #   test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "kafka:29092"]
     #   interval: 10s
@@ -107,7 +107,7 @@ services:
     container_name: kafka-ui
     ports:
       - 8090:8080
-    restart: on-failure:3
+    restart: unless-stopped
     environment:
       - KAFKA_CLUSTERS_0_NAME=local
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092

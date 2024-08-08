@@ -3,10 +3,10 @@ from datetime import datetime
 
 from src.domain.common.entities.aggregate_root import AggregateRoot
 from src.domain.common.value_objects import Id
+from src.domain.messages.events import ChatCreated
 from src.domain.messages.events.messages import (
     ChatDeletedEvent,
     ListenerAddedEvent,
-    NewChatCreatedEvent,
     NewMessageReceivedEvent,
 )
 from src.domain.messages.exceptions import ListenerAlreadyExistsError
@@ -52,7 +52,7 @@ class Chat(AggregateRoot):
     @classmethod
     def create(cls, title: Title) -> "Chat":
         new_chat = cls(title=title)
-        new_chat.record_event(NewChatCreatedEvent(chat_id=new_chat.id.to_raw(), chat_title=new_chat.title.to_raw()))
+        new_chat.record_event(ChatCreated(chat_id=new_chat.id.to_raw(), chat_title=new_chat.title.to_raw()))
         return new_chat
 
     def add_message(self, message: Message) -> None:

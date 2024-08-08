@@ -17,11 +17,5 @@ class ListenerAddedEvent(Event):
 
 
 @dataclass(frozen=True)
-class NewChatCreatedEvent(Event):
-    chat_id: UUID
-    chat_title: str
-
-
-@dataclass(frozen=True)
 class ChatDeletedEvent(Event):
     chat_id: UUID
