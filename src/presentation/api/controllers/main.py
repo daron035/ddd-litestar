@@ -22,7 +22,7 @@ from src.infrastructure.mediator.mediator import MediatorImpl
     dependencies={"container": Provide(init_container, sync_to_thread=False)},
     status_code=status_codes.HTTP_201_CREATED,
 )
-async def index(data: CreateChat, container: Container) -> Any:
+async def create_chat(data: CreateChat, container: Container) -> Any:
     mediator: MediatorImpl = container.resolve(MediatorImpl)
 
     chat = await mediator.send(data)

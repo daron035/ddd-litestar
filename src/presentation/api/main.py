@@ -9,7 +9,7 @@ from src.infrastructure.containers import init_container
 from src.infrastructure.message_broker.factories import KafkaConnectionFactory
 from src.infrastructure.message_broker.interface import MessageBroker
 from src.presentation.api.config import APIConfig
-from src.presentation.api.controllers.main import create_message, get_book, health_check, index
+from src.presentation.api.controllers.main import create_chat, create_message, get_book, health_check
 
 
 @asynccontextmanager
@@ -26,7 +26,7 @@ async def kafka_connection(app: Litestar) -> AsyncGenerator[None, None]:
 def init_api(debug: bool = __debug__) -> Litestar:
     app = Litestar(
         lifespan=[kafka_connection],
-        route_handlers=[index, get_book, health_check, create_message],
+        route_handlers=[create_chat, create_message, get_book, health_check],
         debug=debug,
     )
     return app

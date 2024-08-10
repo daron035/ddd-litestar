@@ -3,11 +3,11 @@ from datetime import datetime
 
 from src.domain.common.entities.aggregate_root import AggregateRoot
 from src.domain.common.value_objects import Id
-from src.domain.messages.events import ChatCreated
-from src.domain.messages.events.messages import (
-    ChatDeletedEvent,
-    ListenerAddedEvent,
-    NewMessageReceivedEvent,
+from src.domain.messages.events import (
+    ChatCreated,
+    ChatDeleted,
+    ListenerAdded,
+    MessageCreated,
 )
 from src.domain.messages.exceptions import ListenerAlreadyExistsError
 from src.domain.messages.value_objects import Text, Title
@@ -58,7 +58,7 @@ class Chat(AggregateRoot):
     def add_message(self, message: Message) -> None:
         self.messages.add(message)
         self.record_event(
-            NewMessageReceivedEvent(
+            MessageCreated(
                 message_id=message.id.to_raw(),
                 message_text=message.text.to_raw(),
                 chat_id=self.id.to_raw(),
@@ -67,11 +67,11 @@ class Chat(AggregateRoot):
 
     def delete(self) -> None:
         self.is_deleted = True
-        self.record_event(ChatDeletedEvent(chat_id=self.id.to_raw()))
+        self.record_event(ChatDeleted(chat_id=self.id.to_raw()))
 
     def add_listener(self, listener: ChatListener) -> None:
         if listener in self.listeners:
             raise ListenerAlreadyExistsError(listener_id=listener.id.to_raw())
 
         self.listeners.add(listener)
-        self.record_event(ListenerAddedEvent(listener_id=listener.id.to_raw()))
+        self.record_event(ListenerAdded(listener_id=listener.id.to_raw()))
