@@ -6,9 +6,11 @@ from uuid import UUID
 
 from uuid6 import uuid7
 
+from src.infrastructure.mediator.interface.entities.event import Event
+
 
 @dataclass(frozen=True, kw_only=True)
-class IntegrationEvent:
+class IntegrationEvent(Event):
     event_id: UUID = field(default_factory=uuid7)
     event_timestamp: datetime = field(default_factory=datetime.now)
     topic: ClassVar[str]

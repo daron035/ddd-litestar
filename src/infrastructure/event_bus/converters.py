@@ -1,18 +1,16 @@
 from src.application.common.exceptions import MappingError
+from src.domain.common.events.event import Event
 from src.domain.messages.events import ChatCreated, MessageCreated
 from src.infrastructure.event_bus import events as integration_events
 
 
-DomainEvents = ChatCreated | MessageCreated
+DomainEvents = Event | ChatCreated | MessageCreated
 
 
 def convert_chat_created_to_integration(
     event: ChatCreated,
 ) -> integration_events.ChatCreated:
-    return integration_events.ChatCreated(
-        chat_id=event.chat_id,
-        chat_title=event.chat_title
-    )
+    return integration_events.ChatCreated(chat_id=event.chat_id, chat_title=event.chat_title)
 
 
 def convert_message_created_to_integration(
