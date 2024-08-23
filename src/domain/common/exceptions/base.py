@@ -1,9 +1,12 @@
 from dataclasses import dataclass
+from typing import ClassVar
 
 
 @dataclass(eq=False)
 class AppError(Exception):
     """Base Error."""
+
+    status: ClassVar[int] = 500
 
     @property
     def title(self) -> str:
@@ -16,11 +19,3 @@ class DomainError(AppError):
     @property
     def title(self) -> str:
         return "A domain error occurred"
-
-
-class ApplicationError(AppError):
-    """Base Application Error."""
-
-    @property
-    def title(self) -> str:
-        return "An application error occurred"

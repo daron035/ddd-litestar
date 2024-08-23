@@ -27,18 +27,12 @@ async def kafka_connection(app: Litestar) -> AsyncGenerator[None, None]:
         await broker.stop()
 
 
-async def consume_in_background():
+async def consume_in_background() -> None:
     container = init_container()
     mediator: MediatorImpl = container.resolve(MediatorImpl)
     message_broker: MessageBroker = container.resolve(MessageBroker)
 
     async for event in message_broker.start_consuming(topic="Message"):
-        print()
-        print()
-        print()
-        print("Kafka Message Has Received")
-        print()
-        print()
         await mediator.publish(
             [
                 MessageReceived(
@@ -51,19 +45,20 @@ async def consume_in_background():
 
 
 @asynccontextmanager
-async def asdf(app: Litestar) -> AsyncGenerator[None, None]:
+async def background_tasks(app: Litestar) -> AsyncGenerator[None, None]:
     job = await Scheduler().spawn(consume_in_background())
-    yield
-    await job.close()
+    try:
+        yield
+    finally:
+        await job.close()
 
 
 def init_api(debug: bool = __debug__) -> Litestar:
-    app = Litestar(
-        lifespan=[kafka_connection, asdf],
+    return Litestar(
+        lifespan=[kafka_connection, background_tasks],
         route_handlers=[create_chat, create_message, get_book, health_check, websocket_endpoint],
         debug=debug,
     )
-    return app
 
 
 async def run_api(app: Litestar, api_config: APIConfig) -> None:

@@ -24,10 +24,7 @@ class CreateMessageHandler(CommandHandler[CreateMessage, Message]):
     _mediator: EventMediator
 
     async def __call__(self, command: CreateMessage) -> Message:
-        chat: Chat | None = await self.chat_repository.get_chat_by_id(chat_id=command.chat_id)
-
-        if not chat:
-            raise Exception  # noqa: TRY002
+        chat: Chat = await self.chat_repository.get_chat_by_id(chat_id=command.chat_id)
 
         message = Message(text=Text(value=command.text), chat_id=Id(value=command.chat_id))
         chat.add_message(message)

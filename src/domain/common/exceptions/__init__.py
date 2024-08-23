@@ -1,6 +1,5 @@
 from .base import (
     AppError,
-    ApplicationError,
     DomainError,
 )
 
@@ -8,5 +7,4 @@ from .base import (
 __all__ = (
     "AppError",
     "DomainError",
-    "ApplicationError",
 )

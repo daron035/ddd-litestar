@@ -1,6 +1,7 @@
 from dataclasses import dataclass
+from uuid import UUID
 
-from src.domain.common.exceptions import ApplicationError
+from src.application.common.exceptions import ApplicationError
 
 
 @dataclass(eq=False)
@@ -8,14 +9,14 @@ class ChatWithThatTitleAlreadyExistsError(ApplicationError):
     error_message: str
 
     @property
-    def message(self) -> str:
-        return f'Чат c таким названием "{self.error_message}" уже существует.'
+    def title(self) -> str:
+        return f'A chat with this name "{self.error_message}" already exists.'
 
 
 @dataclass(eq=False)
 class ChatNotFoundError(ApplicationError):
-    chat_oid: str
+    chat_id: UUID
 
     @property
-    def message(self) -> str:
-        return "Чат c таким ID не найден."
+    def title(self) -> str:
+        return f'A chat with "{self.chat_id}" chat_id doesn\'t exist'

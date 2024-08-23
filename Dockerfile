@@ -37,7 +37,7 @@ WORKDIR /app
 COPY ./src /app/src
 
 EXPOSE 8000
-CMD ["uvicorn", "src.presentation.api.main:init_api", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "src.presentation.api.main:init_api", "--workers", "4", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
 
 FROM python-base AS production

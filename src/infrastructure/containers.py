@@ -1,5 +1,4 @@
 from functools import lru_cache
-from uuid import uuid4
 
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -106,9 +105,10 @@ def _init_kafka(container: Container) -> KafkaMessageBroker:
     _producer = AIOKafkaProducer(bootstrap_servers=config.event_bus.bootstrap_servers)
     _consumer = AIOKafkaConsumer(
         # "Chat",
+        # *["Chat"],
         bootstrap_servers=config.event_bus.bootstrap_servers,
-        # group_id="chat",
-        group_id=f"chats-{uuid4()}",
+        # group_id=f"chats-{uuid4()}",
+        group_id="chat",
         metadata_max_age_ms=30000,
     )
     return KafkaMessageBroker(producer=_producer, consumer=_consumer)

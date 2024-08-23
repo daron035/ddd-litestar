@@ -18,5 +18,8 @@ class MemoryChatRepoImpl(ChatRepo):
     async def add_chat(self, chat: Chat) -> None:
         self._saved_chats.append(chat)
 
-    async def get_chat_by_id(self, chat_id: UUID) -> Chat | None:
-        pass
+    async def get_chat_by_id(self, chat_id: UUID) -> Chat:
+        try:
+            return next(chat for chat in self._saved_chats if chat.id == chat_id)
+        except StopIteration:
+            return None

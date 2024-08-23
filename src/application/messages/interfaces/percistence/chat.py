@@ -16,5 +16,5 @@ class ChatRepo(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_chat_by_id(self, chat_id: UUID) -> Chat | None:
+    async def get_chat_by_id(self, chat_id: UUID) -> Chat:
         raise NotImplementedError

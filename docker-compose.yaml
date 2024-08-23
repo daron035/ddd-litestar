@@ -118,6 +118,41 @@ services:
     networks:
       - litestar.kafka.network
 
+  # create-topics:
+  #   image: confluentinc/cp-kafka:latest
+  #   container_name: create-topics
+  #   depends_on:
+  #     kafka:
+  #       condition: service_healthy
+  #   entrypoint:
+  #     - /bin/sh
+  #     - -c
+  #     - |
+  #       echo "Waiting for Kafka to be ready..."
+  #       cub kafka-ready -b kafka:29092 1 20 && \
+  #       kafka-topics --create --topic Chat --partitions 3 --replication-factor 1 --if-not-exists --bootstrap-server kafka:29092 && \
+  #       kafka-topics --create --topic Message --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka:29092 && \
+  #       echo "Topics created!"
+  #   networks:
+  #     - litestar.kafka.network
+  #   restart: "no"
+
+  # create-topics:
+  #   image: confluentinc/cp-kafka:latest
+  #   container_name: create-topics
+  #   depends_on:
+  #     kafka:
+  #       condition: service_healthy
+  #   volumes:
+  #     - ./entrypoint.sh:/usr/local/bin/entrypoint.sh
+  #   entrypoint:
+  #     - /bin/sh
+  #     - /usr/local/bin/entrypoint.sh
+  #   networks:
+  #     - litestar.kafka.network
+  #   restart: "no"
+
+
 
 volumes:
   litestar.mongodb.data:

@@ -39,22 +39,18 @@ class EventObserverImpl(EventObserver):
 
     def register_listener(self, listener: Listener[Event]) -> None:
         self._listeners.append(listener)
-        print(f"Listener registered: {self._listeners}")
 
     async def publish(self, events: Sequence[Event], *args: Any, **kwargs: Any) -> None:
-        print(f"Publishing events: {events}")
-        print(f"Current listeners before handling: {self._listeners}")
         await self._handle(events, *args, **kwargs)
 
     async def _handle(self, events: Sequence[Event], *args: Any, **kwargs: Any) -> None:
         middlewares: Middlewares = self._middlewares if self._middlewares else DEFAULT_MIDDLEWARES
 
         for event in events:
-            print(f"Handling event: {event}")
-            print(f"Listeners: {self._listeners}")
             for listener in self._listeners:
-                wrapped_handler = self._wrap_middleware(middlewares, listener.handler)
-                await wrapped_handler(event, *args, **kwargs)
+                if listener.is_listen(event):
+                    wrapped_handler = self._wrap_middleware(middlewares, listener.handler)
+                    await wrapped_handler(event, *args, **kwargs)
 
     @staticmethod
     def _wrap_middleware(

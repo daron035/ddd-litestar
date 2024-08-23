@@ -50,5 +50,22 @@ logs:
 messaging-logs:
   docker compose --profile kafka logs -f
 
+# Kafka setup
+kafka-setup:
+  echo "Waiting for Kafka to be ready..."
+  docker exec -it main-kafka cub kafka-ready -b kafka:29092 1 20
+
+  # echo "Creating topics if they do not exist..."
+  docker exec -it main-kafka kafka-topics --create --topic Chat --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka:29092
+  docker exec -it main-kafka kafka-topics --create --topic Message --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka:29092
+
+  # Alter partitions for existing topics
+  # docker exec -it main-kafka kafka-topics --alter --topic Chat --partitions 10 --bootstrap-server kafka:29092
+  # docker exec -it main-kafka kafka-topics --alter --topic Message --partitions 40 --bootstrap-server kafka:29092
+
+  echo "Topics updated!"
+
+
+
 _py *args:
   poetry run {{args}}

@@ -2,6 +2,8 @@ from abc import abstractmethod
 from collections.abc import AsyncIterator
 from typing import Protocol
 
+from src.domain.common.events.event import Event
+
 
 class MessageBroker(Protocol):
     @abstractmethod
@@ -16,5 +18,5 @@ class MessageBroker(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    async def start_consuming(self, topic: str) -> AsyncIterator[dict]:
+    async def start_consuming(self, topic: str) -> AsyncIterator[Event]:
         raise NotImplementedError
