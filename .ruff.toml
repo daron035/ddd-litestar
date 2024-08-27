@@ -58,6 +58,7 @@ ignore = [
     "ARG002", # Unused method argument: `now`
     "ISC001", # Implicitly concatenated string literals on one line
     "COM812", # Explicitly concatenated string should be implicitly concatenated
+    "UP040", # Checks for use of TypeAlias annotations and TypeAliasType assignments for declaring type aliases.
 ]
 
 [lint.flake8-annotations]

@@ -1,20 +1,19 @@
-from typing import Any
+from typing import Annotated, Any
 from uuid import UUID
 
-from litestar import (
-    MediaType,
-    get,
-    post,
-)
+from litestar import MediaType, get, post
 from litestar.di import Provide
 from litestar.exceptions import HTTPException
 from litestar.openapi import ResponseSpec
+from litestar.params import Parameter
 from litestar.status_codes import HTTP_400_BAD_REQUEST
 from punq import Container
 
 from src.application.common.exceptions import ApplicationError
+from src.application.common.pagination.dto import Pagination, SortOrder
 from src.application.messages.commands.create_chat import CreateChat
 from src.application.messages.commands.create_message import CreateMessage
+from src.application.messages.queries.get_messages_by_chat import GetMessagesByChatId
 from src.infrastructure.containers import init_container
 from src.infrastructure.mediator.mediator import MediatorImpl
 
@@ -57,6 +56,43 @@ async def create_message(data: str, chat_id: UUID, container: Container) -> Any:
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=f"{exception.title}") from exception
 
     return message
+
+
+@get(
+    path="/{chat_id:uuid}/messages",
+    description="Grab all messages from certain chat room",
+    dependencies={
+        "container": Provide(init_container, sync_to_thread=False),
+    },
+    responses={
+        200: ResponseSpec(None, description="Messages received"),
+        400: ResponseSpec(None, description="Error occured"),
+    },
+)
+async def get_chat_messages(
+    chat_id: UUID,
+    offset: Annotated[int, Parameter(ge=0, default=0)],
+    limit: Annotated[int, Parameter(gt=0, default=10)],
+    order: Annotated[SortOrder, Parameter(default=SortOrder.ASC)],
+    container: Container,
+) -> Any:
+    mediator: MediatorImpl = container.resolve(MediatorImpl)
+
+    try:
+        messages = await mediator.query(
+            GetMessagesByChatId(
+                chat_id=chat_id,
+                pagination=Pagination(
+                    offset=offset,
+                    limit=limit,
+                    order=order,
+                ),
+            ),
+        )
+    except ApplicationError as exception:
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=f"{exception.title}") from exception
+
+    return messages
 
 
 @get("/books/{book_id:int}")

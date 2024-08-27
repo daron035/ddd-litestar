@@ -9,6 +9,8 @@ from src.application.messages.commands.create_message import CreateMessage, Crea
 from src.application.messages.events.message_received import MessageReceived, MessageReceivedHandler
 from src.application.messages.interfaces.percistence.chat import ChatRepo
 from src.application.messages.interfaces.percistence.message import MessageRepo
+from src.application.messages.interfaces.percistence.reader import MessageReader
+from src.application.messages.queries.get_messages_by_chat import GetMessagesByChatId, GetMessagesByChatIdHandler
 from src.application.messages.websockets.managers import ConnectionManager, WebSocketConnectionManager
 from src.domain.common.events.event import Event
 from src.infrastructure.config_loader import load_config
@@ -18,7 +20,7 @@ from src.infrastructure.mediator.mediator import MediatorImpl
 from src.infrastructure.message_broker.interface import MessageBroker
 from src.infrastructure.message_broker.kafka import KafkaMessageBroker
 from src.infrastructure.mongo.repositories.chat import MongoDBChatRepoImpl
-from src.infrastructure.mongo.repositories.message import MongoDBMessageRepoImpl
+from src.infrastructure.mongo.repositories.message import MongoDBMessageReaderImpl, MongoDBMessageRepoImpl
 from src.presentation.api.config import Config
 
 
@@ -35,6 +37,7 @@ def init_container() -> Container:
     container.register(EventBusImpl, factory=lambda: _init_event_bus(container), scope=Scope.singleton)
     container.register(ChatRepo, factory=lambda: _init_chat_mongodb_repository(container), scope=Scope.singleton)
     container.register(MessageRepo, factory=lambda: _init_message_mongodb_repository(container), scope=Scope.singleton)
+    container.register(MessageReader, factory=lambda: _init_message_mongodb_reader(container), scope=Scope.singleton)
     container.register(WebSocketConnectionManager, instance=ConnectionManager(), scope=Scope.singleton)
     container.register(MediatorImpl, factory=lambda: _init_mediator(container))
 
@@ -56,6 +59,12 @@ def _init_mediator(container: Container) -> MediatorImpl:
     )
     mediator.register_command_handler(CreateChat, create_chat_handler)
     mediator.register_command_handler(CreateMessage, create_message_handler)
+
+    # Register query handlers
+    get_chat_messages_handler = GetMessagesByChatIdHandler(
+        messages_repository=container.resolve(MessageReader),
+    )
+    mediator.register_query_handler(GetMessagesByChatId, get_chat_messages_handler)
 
     # Register event handlers
     mediator.register_event_handler(Event, _init_event_handler(container))
@@ -94,6 +103,16 @@ def _init_message_mongodb_repository(container: Container) -> MongoDBMessageRepo
     config: Config = container.resolve(Config)
     client = AsyncIOMotorClient(config.mongo.mongodb_connection_uri, serverSelectionTimeoutMS=3000)
     return MongoDBMessageRepoImpl(
+        mongo_client=client,
+        mongo_db_name=config.mongo.mongodb_chat_database,
+        mongo_collection_name=config.mongo.mongodb_chat_collection,
+    )
+
+
+def _init_message_mongodb_reader(container: Container) -> MongoDBMessageReaderImpl:
+    config: Config = container.resolve(Config)
+    client = AsyncIOMotorClient(config.mongo.mongodb_connection_uri, serverSelectionTimeoutMS=3000)
+    return MongoDBMessageReaderImpl(
         mongo_client=client,
         mongo_db_name=config.mongo.mongodb_chat_database,
         mongo_collection_name=config.mongo.mongodb_chat_collection,
