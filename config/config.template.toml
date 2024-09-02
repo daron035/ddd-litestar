@@ -8,16 +8,17 @@ mongodb_connection_uri = "mongodb://mongodb:27017"
 mongodb_chat_database = "chat"
 mongodb_chat_collection = "chat"
 
-[db]
-host = "localhost"
+[postgres_db]
+host = "postgres"
 port = 5432
-database = "user_service"
+database = "postgres_db"
 user = "admin"
 password = "admin"
 echo = true
 
 [event_bus]
 bootstrap_servers = "kafka:29092"
+group_id = "chat"
 metadata_max_age_ms = 30000
 
 [logging]

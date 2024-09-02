@@ -7,7 +7,7 @@ from adaptix import Retort
 
 
 T = TypeVar("T")
-DEFAULT_CONFIG_PATH = "./config/config.toml"
+DEFAULT_CONFIG_PATH = "./config/config.template.toml"
 
 
 def read_toml(path: str) -> dict:
@@ -26,4 +26,5 @@ def load_config(config_type: type[T], config_scope: str | None = None, path: str
 
     dcf = Retort()
     config = dcf.load(data, config_type)
+    
     return config

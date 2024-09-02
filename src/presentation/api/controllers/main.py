@@ -16,6 +16,7 @@ from src.application.messages.commands.create_message import CreateMessage
 from src.application.messages.queries.get_messages_by_chat import GetMessagesByChatId
 from src.infrastructure.containers import init_container
 from src.infrastructure.mediator.mediator import MediatorImpl
+from src.infrastructure.postgres.repositories.base import PostgresRepo
 
 
 @post(
@@ -103,3 +104,19 @@ async def get_book(book_id: int) -> dict[str, int]:
 @get(path="/healthcheck", media_type=MediaType.TEXT, sync_to_thread=False)
 def health_check() -> str:
     return "healthy"
+
+
+
+@get(
+    path="/test-db-connection",
+    description="Example of an endpoint using a SQLAlchemy session",
+    dependencies={
+        "container": Provide(init_container, sync_to_thread=False),
+    },
+)
+async def test_postgres_db(
+    container: Container,
+) -> str:
+    psql: PostgresRepo = container.resolve(PostgresRepo)
+    await psql.check()
+    return "👍"

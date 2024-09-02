@@ -16,10 +16,11 @@ services:
       - ./src:/app/src
       - ./config:/app/config:ro
     networks:
+      - litestar.postgres.network
       - litestar.mongo.network
       - litestar.kafka.network
     environment:
-      - CONFIG_PATH=${CONFIG_PATH:-./config/config.template.toml}
+      - CONFIG_PATH=${CONFIG_PATH:-./config/config.toml}
     depends_on:
       kafka:
         condition:
@@ -30,6 +31,80 @@ services:
     #   timeout: 60s
     #   retries: 5
     #   start_period: 10s
+
+  postgres_migration:
+    profiles: [ "migration" ]
+    container_name: litestar.postgres_migration
+    build:
+      context: .
+    restart: on-failure
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - litestar.postgres.network
+    volumes:
+      - ./config:/app/config:ro
+      - ./alembic.ini:/app/alembic.ini:ro
+      - ./src/infrastructure/db/migrations:/app/src/infrastructure/db/migrations:ro
+    environment:
+      - CONFIG_PATH=${CONFIG_PATH:-./config/prod_config.toml}
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+
+  postgres:
+    profiles: [ "api", "migration" ]
+    container_name: litestar.postgres
+    image: "postgres:16-alpine"
+    hostname: user_service.postgres
+    restart: unless-stopped
+    expose:
+      - "5432"
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    networks:
+      - litestar.postgres.network
+    environment:
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_USER: ${POSTGRES_USER:-$USER}
+      POSTGRES_DB: ${POSTGRES_DB:-$USER}
+    volumes:
+      - litestar.postgres.data:/var/lib/postgresql/data:rw
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+
+  postgres_backup:
+    profiles: [ "api" ]
+    container_name: litestar.postgres_backup
+    image: prodrigestivill/postgres-backup-local:15-alpine
+    networks:
+      - litestar.postgres.network
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=${POSTGRES_DB:-$USER}
+      - POSTGRES_USER=${POSTGRES_USER:-$USER}
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - BACKUP_DIR=/backups
+      - POSTGRES_EXTRA_OPTS=-Z6 --schema=public --blobs
+      - SCHEDULE=${POSTGRES_BACKUP_SCHEDULE:-@daily}
+      - HEALTHCHECK_PORT=8080
+    volumes:
+      - ${POSTGRES_BACKUP_DIR:-./.backups/postgres}:/backups
+
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    expose:
+      - "5050"
 
   mongodb:
     profiles: [ "api" ]
@@ -155,9 +230,12 @@ services:
 
 
 volumes:
+  litestar.postgres.data:
   litestar.mongodb.data:
 
 
 networks:
+  litestar.postgres.network:
+    driver: bridge
   litestar.mongo.network:
   litestar.kafka.network:

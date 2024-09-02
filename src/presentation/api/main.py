@@ -12,7 +12,14 @@ from src.infrastructure.mediator.mediator import MediatorImpl
 from src.infrastructure.message_broker.factories import KafkaConnectionFactory
 from src.infrastructure.message_broker.interface import MessageBroker
 from src.presentation.api.config import APIConfig
-from src.presentation.api.controllers.main import create_chat, create_message, get_book, get_chat_messages, health_check
+from src.presentation.api.controllers.main import (
+    create_chat,
+    create_message,
+    get_book,
+    get_chat_messages,
+    health_check,
+    test_postgres_db,
+)
 from src.presentation.api.controllers.websockets.messages import websocket_endpoint
 
 
@@ -56,7 +63,15 @@ async def background_tasks(app: Litestar) -> AsyncGenerator[None, None]:
 def init_api(debug: bool = __debug__) -> Litestar:
     return Litestar(
         lifespan=[kafka_connection, background_tasks],
-        route_handlers=[create_chat, create_message, get_chat_messages, get_book, health_check, websocket_endpoint],
+        route_handlers=[
+            create_chat,
+            create_message,
+            get_chat_messages,
+            get_book,
+            health_check,
+            websocket_endpoint,
+            test_postgres_db,
+        ],
         debug=debug,
     )
 

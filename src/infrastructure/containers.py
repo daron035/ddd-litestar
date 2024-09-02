@@ -21,6 +21,8 @@ from src.infrastructure.message_broker.interface import MessageBroker
 from src.infrastructure.message_broker.kafka import KafkaMessageBroker
 from src.infrastructure.mongo.repositories.chat import MongoDBChatRepoImpl
 from src.infrastructure.mongo.repositories.message import MongoDBMessageReaderImpl, MongoDBMessageRepoImpl
+from src.infrastructure.postgres.main import PostgresManager
+from src.infrastructure.postgres.repositories.base import PostgresRepo, PostgresRepoImpl
 from src.presentation.api.config import Config
 
 
@@ -31,7 +33,6 @@ _config = load_config(Config)
 def init_container() -> Container:
     container = Container()
 
-    # Register dependencies
     container.register(Config, instance=_config, scope=Scope.singleton)
     container.register(MessageBroker, factory=lambda: _init_kafka(container), scope=Scope.singleton)
     container.register(EventBusImpl, factory=lambda: _init_event_bus(container), scope=Scope.singleton)
@@ -41,13 +42,14 @@ def init_container() -> Container:
     container.register(WebSocketConnectionManager, instance=ConnectionManager(), scope=Scope.singleton)
     container.register(MediatorImpl, factory=lambda: _init_mediator(container))
 
+    _db_factories(container)
+
     return container
 
 
 def _init_mediator(container: Container) -> MediatorImpl:
     mediator = MediatorImpl()
 
-    # Register command handlers
     create_chat_handler = CreateChatHandler(
         chat_repository=container.resolve(ChatRepo),
         _mediator=mediator,
@@ -60,13 +62,11 @@ def _init_mediator(container: Container) -> MediatorImpl:
     mediator.register_command_handler(CreateChat, create_chat_handler)
     mediator.register_command_handler(CreateMessage, create_message_handler)
 
-    # Register query handlers
     get_chat_messages_handler = GetMessagesByChatIdHandler(
         messages_repository=container.resolve(MessageReader),
     )
     mediator.register_query_handler(GetMessagesByChatId, get_chat_messages_handler)
 
-    # Register event handlers
     mediator.register_event_handler(Event, _init_event_handler(container))
     mediator.register_event_handler(MessageReceived, _init_message_received_handler(container))
 
@@ -123,11 +123,19 @@ def _init_kafka(container: Container) -> KafkaMessageBroker:
     config: Config = container.resolve(Config)
     _producer = AIOKafkaProducer(bootstrap_servers=config.event_bus.bootstrap_servers)
     _consumer = AIOKafkaConsumer(
-        # "Chat",
-        # *["Chat"],
         bootstrap_servers=config.event_bus.bootstrap_servers,
-        # group_id=f"chats-{uuid4()}",
         group_id="chat",
         metadata_max_age_ms=30000,
     )
     return KafkaMessageBroker(producer=_producer, consumer=_consumer)
+
+
+def _db_factories(container: Container) -> None:
+    config: Config = container.resolve(Config)
+    container.register(PostgresManager, factory=lambda: PostgresManager(config.postgres_db), scope=Scope.singleton)
+    psql: PostgresManager = container.resolve(PostgresManager)
+    container.register(
+        PostgresRepo,
+        factory=lambda: PostgresRepoImpl(psql.session_factory()),
+        scope=Scope.transient
+    )

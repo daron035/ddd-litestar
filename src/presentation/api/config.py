@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 
 from src.infrastructure.message_broker.config import EventBusConfig
 from src.infrastructure.mongo.config import MongoConfig
+from src.infrastructure.postgres.config import PostgresConfig
 
 
 @dataclass
@@ -14,5 +15,6 @@ class APIConfig:
 @dataclass
 class Config:
     api: APIConfig = field(default_factory=APIConfig)
-    mongo: MongoConfig = field(default_factory=MongoConfig)
+    postgres_db: PostgresConfig = field(default_factory=PostgresConfig)
     event_bus: EventBusConfig = field(default_factory=EventBusConfig)
+    mongo: MongoConfig = field(default_factory=MongoConfig)
