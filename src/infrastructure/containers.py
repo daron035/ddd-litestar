@@ -22,7 +22,9 @@ from src.infrastructure.message_broker.kafka import KafkaMessageBroker
 from src.infrastructure.mongo.repositories.chat import MongoDBChatRepoImpl
 from src.infrastructure.mongo.repositories.message import MongoDBMessageReaderImpl, MongoDBMessageRepoImpl
 from src.infrastructure.postgres.main import PostgresManager
-from src.infrastructure.postgres.repositories.base import PostgresRepo, PostgresRepoImpl
+from src.infrastructure.postgres.services.healthcheck import PgHealthCheck, PostgresHealthcheckService
+
+# from src.infrastructure.postgres.repositories.base import PostgresRepo, PostgresRepoImpl
 from src.presentation.api.config import Config
 
 
@@ -135,7 +137,7 @@ def _db_factories(container: Container) -> None:
     container.register(PostgresManager, factory=lambda: PostgresManager(config.postgres_db), scope=Scope.singleton)
     psql: PostgresManager = container.resolve(PostgresManager)
     container.register(
-        PostgresRepo,
-        factory=lambda: PostgresRepoImpl(psql.session_factory()),
-        scope=Scope.transient
+        PgHealthCheck,
+        factory=lambda: PostgresHealthcheckService(psql.session_factory()),
+        scope=Scope.transient,
     )

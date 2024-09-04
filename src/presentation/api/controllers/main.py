@@ -16,7 +16,7 @@ from src.application.messages.commands.create_message import CreateMessage
 from src.application.messages.queries.get_messages_by_chat import GetMessagesByChatId
 from src.infrastructure.containers import init_container
 from src.infrastructure.mediator.mediator import MediatorImpl
-from src.infrastructure.postgres.repositories.base import PostgresRepo
+from src.infrastructure.postgres.services.healthcheck import PgHealthCheck
 
 
 @post(
@@ -106,7 +106,6 @@ def health_check() -> str:
     return "healthy"
 
 
-
 @get(
     path="/test-db-connection",
     description="Example of an endpoint using a SQLAlchemy session",
@@ -116,7 +115,7 @@ def health_check() -> str:
 )
 async def test_postgres_db(
     container: Container,
-) -> str:
-    psql: PostgresRepo = container.resolve(PostgresRepo)
-    await psql.check()
-    return "👍"
+) -> Any:
+    psql: PgHealthCheck = container.resolve(PgHealthCheck)
+    response = await psql.check()
+    return response

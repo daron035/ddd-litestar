@@ -13,3 +13,4 @@ pytestdebug.log
 .pytest_cache/
 config.toml
 prod_config.toml
+.DS_Store

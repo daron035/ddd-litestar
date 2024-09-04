@@ -11,6 +11,22 @@ class ApplicationError(AppError):
         return "An application error occurred"
 
 
+class UnexpectedError(ApplicationError):
+    pass
+
+
+class CommitError(UnexpectedError):
+    pass
+
+
+class RollbackError(UnexpectedError):
+    pass
+
+
+class RepoError(UnexpectedError):
+    pass
+
+
 @dataclass(eq=False)
 class MappingError(ApplicationError):
     _text: str
