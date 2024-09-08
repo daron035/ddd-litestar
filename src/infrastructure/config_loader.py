@@ -26,5 +26,5 @@ def load_config(config_type: type[T], config_scope: str | None = None, path: str
 
     dcf = Retort()
     config = dcf.load(data, config_type)
-    
+
     return config

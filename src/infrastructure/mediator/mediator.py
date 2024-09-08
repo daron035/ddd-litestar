@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Any, TypeVar
+from typing import Any
 
 from src.infrastructure.mediator.dispatchers.command import CommandDispatcherImpl
 from src.infrastructure.mediator.dispatchers.query import QueryDispatcherImpl
@@ -9,16 +9,9 @@ from src.infrastructure.mediator.interface.entities import Command, Event, Query
 from src.infrastructure.mediator.interface.handlers.command import CommandHandlerType
 from src.infrastructure.mediator.interface.handlers.event import EventHandlerType
 from src.infrastructure.mediator.interface.handlers.query import QueryHandlerType
-from src.infrastructure.mediator.interface.mediator import Mediator
+from src.infrastructure.mediator.interface.mediator import C, CRes, E, Mediator, Q, QRes
 from src.infrastructure.mediator.interface.observers.event import EventObserver, Listener
 from src.infrastructure.mediator.observers.event import EventObserverImpl
-
-
-C = TypeVar("C", bound=Command[Any])
-CRes = TypeVar("CRes")
-Q = TypeVar("Q", bound=Query[Any])
-QRes = TypeVar("QRes")
-E = TypeVar("E", bound=Event)
 
 
 class MediatorImpl(Mediator):

@@ -44,7 +44,7 @@ services:
     volumes:
       - ./config:/app/config:ro
       - ./alembic.ini:/app/alembic.ini:ro
-      - ./src/infrastructure/db/migrations:/app/src/infrastructure/db/migrations:ro
+      - ./src/infrastructure/postgres/migrations:/app/src/infrastructure/postgres/migrations:ro
     environment:
       - CONFIG_PATH=${CONFIG_PATH:-./config/prod_config.toml}
     command: ["python", "-m", "alembic", "upgrade", "head"]

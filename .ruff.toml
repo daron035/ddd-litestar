@@ -1,11 +1,12 @@
 target-version = "py312"
 line-length = 120
+extend-exclude = [
+    "tests",
+    "migrations",
+]
 
 [format]
 skip-magic-trailing-comma = false
-
-[lint]
-select = ["ALL"]
 exclude = [
     ".git",
     "__pycache__",
@@ -18,9 +19,10 @@ exclude = [
     "build",
     "docs",
     "benchmarks",
-    "tests/*",
 ]
 
+[lint]
+select = ["ALL"]
 ignore = [
     "A003", # Python builtin is shadowed by class attribute {name} from {row}
     "B008", # Do not perform function call {name} in argument defaults

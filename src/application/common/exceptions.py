@@ -19,6 +19,10 @@ class CommitError(UnexpectedError):
     pass
 
 
+class SessionCloseError(UnexpectedError):
+    pass
+
+
 class RollbackError(UnexpectedError):
     pass
 

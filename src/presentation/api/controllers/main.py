@@ -14,6 +14,7 @@ from src.application.common.pagination.dto import Pagination, SortOrder
 from src.application.messages.commands.create_chat import CreateChat
 from src.application.messages.commands.create_message import CreateMessage
 from src.application.messages.queries.get_messages_by_chat import GetMessagesByChatId
+from src.application.user.commands.create_user import CreateUser
 from src.infrastructure.containers import init_container
 from src.infrastructure.mediator.mediator import MediatorImpl
 from src.infrastructure.postgres.services.healthcheck import PgHealthCheck
@@ -119,3 +120,23 @@ async def test_postgres_db(
     psql: PgHealthCheck = container.resolve(PgHealthCheck)
     response = await psql.check()
     return response
+
+
+@post(
+    path="/user",
+    description="Create new user",
+    dependencies={"container": Provide(init_container, sync_to_thread=False)},
+    responses={
+        201: ResponseSpec(None, description="Chat successfully created"),
+        400: ResponseSpec(None, description="Error occured"),
+    },
+)
+async def create_user(data: CreateUser, container: Container) -> Any:
+    mediator: MediatorImpl = container.resolve(MediatorImpl)
+
+    try:
+        chat = await mediator.send(data)
+    except ApplicationError as exception:
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=f"{exception.title}") from exception
+
+    return chat

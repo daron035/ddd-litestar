@@ -1,6 +1,5 @@
 from faker import Faker
 from httpx import Response
-
 from litestar import Litestar
 from litestar.status_codes import HTTP_201_CREATED, HTTP_500_INTERNAL_SERVER_ERROR
 from litestar.testing import AsyncTestClient

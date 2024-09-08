@@ -14,3 +14,4 @@ pytestdebug.log
 config.toml
 prod_config.toml
 .DS_Store
+.backups

@@ -2,10 +2,10 @@ from faker import Faker
 
 from src.application.messages.commands.create_chat import CreateChat
 from src.application.messages.interfaces.percistence.chat import ChatRepo
-from src.infrastructure.mediator.mediator import MediatorImpl
 
 # from src.infrastructure.repositories.messages.base import BaseChatRepository
 from src.domain.messages.entities.messages import Chat
+from src.infrastructure.mediator.mediator import MediatorImpl
 
 
 async def test_create_chat_command_success(

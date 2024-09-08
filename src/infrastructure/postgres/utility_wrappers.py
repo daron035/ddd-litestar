@@ -21,7 +21,16 @@ def exception_mapper(
             return await func(*args, **kwargs)
         except SQLAlchemyError as err:
             raise RepoError from err
-        finally:
-            await args[0]._session.close()
 
     return wrapped
+
+
+def close_session(func: Func) -> Func:
+    @wraps(func)
+    async def wrapper(self: Any, *args: Param.args, **kwargs: Param.kwargs) -> object:
+        try:
+            return await func(self, *args, **kwargs)
+        finally:
+            await self.uow.close()
+
+    return wrapper

@@ -4,6 +4,7 @@ from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from motor.motor_asyncio import AsyncIOMotorClient
 from punq import Container, Scope
 
+from src.application.common.interfaces.uow import UnitOfWork
 from src.application.messages.commands.create_chat import CreateChat, CreateChatHandler
 from src.application.messages.commands.create_message import CreateMessage, CreateMessageHandler
 from src.application.messages.events.message_received import MessageReceived, MessageReceivedHandler
@@ -12,6 +13,8 @@ from src.application.messages.interfaces.percistence.message import MessageRepo
 from src.application.messages.interfaces.percistence.reader import MessageReader
 from src.application.messages.queries.get_messages_by_chat import GetMessagesByChatId, GetMessagesByChatIdHandler
 from src.application.messages.websockets.managers import ConnectionManager, WebSocketConnectionManager
+from src.application.user.commands.create_user import CreateUser, CreateUserHandler
+from src.application.user.intefraces.persistence.repo import UserRepo
 from src.domain.common.events.event import Event
 from src.infrastructure.config_loader import load_config
 from src.infrastructure.event_bus.event_bus import EventBusImpl
@@ -22,9 +25,10 @@ from src.infrastructure.message_broker.kafka import KafkaMessageBroker
 from src.infrastructure.mongo.repositories.chat import MongoDBChatRepoImpl
 from src.infrastructure.mongo.repositories.message import MongoDBMessageReaderImpl, MongoDBMessageRepoImpl
 from src.infrastructure.postgres.main import PostgresManager
+from src.infrastructure.postgres.repositories.user import UserRepoImpl
 from src.infrastructure.postgres.services.healthcheck import PgHealthCheck, PostgresHealthcheckService
-
-# from src.infrastructure.postgres.repositories.base import PostgresRepo, PostgresRepoImpl
+from src.infrastructure.postgres.uow import SQLAlchemyUoW
+from src.infrastructure.uow import build_uow
 from src.presentation.api.config import Config
 
 
@@ -61,12 +65,20 @@ def _init_mediator(container: Container) -> MediatorImpl:
         message_repository=container.resolve(MessageRepo),
         _mediator=mediator,
     )
+    create_user_handler = CreateUserHandler(
+        user_repo=container.resolve(UserRepo),
+        uow=container.resolve(UnitOfWork),
+        _mediator=mediator,
+    )
+
     mediator.register_command_handler(CreateChat, create_chat_handler)
     mediator.register_command_handler(CreateMessage, create_message_handler)
+    mediator.register_command_handler(CreateUser, create_user_handler)
 
     get_chat_messages_handler = GetMessagesByChatIdHandler(
         messages_repository=container.resolve(MessageReader),
     )
+
     mediator.register_query_handler(GetMessagesByChatId, get_chat_messages_handler)
 
     mediator.register_event_handler(Event, _init_event_handler(container))
@@ -136,8 +148,8 @@ def _db_factories(container: Container) -> None:
     config: Config = container.resolve(Config)
     container.register(PostgresManager, factory=lambda: PostgresManager(config.postgres_db), scope=Scope.singleton)
     psql: PostgresManager = container.resolve(PostgresManager)
-    container.register(
-        PgHealthCheck,
-        factory=lambda: PostgresHealthcheckService(psql.session_factory()),
-        scope=Scope.transient,
-    )
+    session = psql.session_factory()
+    container.register(PgHealthCheck, factory=lambda: PostgresHealthcheckService(session))
+
+    container.register(UnitOfWork, factory=lambda: build_uow(SQLAlchemyUoW(session)))
+    container.register(UserRepo, factory=lambda: UserRepoImpl(session))

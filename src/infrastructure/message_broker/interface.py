@@ -7,7 +7,7 @@ from src.domain.common.events.event import Event
 
 class MessageBroker(Protocol):
     @abstractmethod
-    async def publish_message(  # noqa: PLR0913
+    async def publish_message(
         self,
         topic: str,
         key: bytes,

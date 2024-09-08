@@ -1,9 +1,9 @@
-from pytest import fixture
-
-from typing import TYPE_CHECKING, AsyncIterator
+from collections.abc import AsyncIterator
+from typing import TYPE_CHECKING
 
 from litestar import Litestar
 from litestar.testing import AsyncTestClient
+from pytest import fixture
 
 from src.presentation.api.main import init_api
 
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from litestar import Litestar
 
 
-@fixture
+@fixture()
 def app() -> Litestar:
     app = init_api()
 

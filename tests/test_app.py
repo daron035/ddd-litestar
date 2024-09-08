@@ -1,4 +1,5 @@
 import pytest
+
 from litestar import Litestar
 from litestar.status_codes import HTTP_200_OK
 from litestar.testing import TestClient

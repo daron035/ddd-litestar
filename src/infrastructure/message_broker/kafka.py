@@ -7,7 +7,7 @@ from src.infrastructure.message_broker.interface import MessageBroker
 
 
 class KafkaMessageBroker(KafkaConnectionFactory, MessageBroker):
-    async def publish_message(  # noqa: PLR0913
+    async def publish_message(
         self,
         topic: str,
         key: bytes,

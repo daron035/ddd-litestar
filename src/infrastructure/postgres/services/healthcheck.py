@@ -3,8 +3,8 @@ from typing import Protocol
 
 import sqlalchemy as sa
 
-from src.infrastructure.postgres.exception_mapper import exception_mapper
 from src.infrastructure.postgres.repositories.base import SQLAlchemyRepo
+from src.infrastructure.postgres.utility_wrappers import exception_mapper
 
 
 class PgHealthCheck(Protocol):

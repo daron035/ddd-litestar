@@ -15,6 +15,7 @@ from src.presentation.api.config import APIConfig
 from src.presentation.api.controllers.main import (
     create_chat,
     create_message,
+    create_user,
     get_book,
     get_chat_messages,
     health_check,
@@ -71,6 +72,7 @@ def init_api(debug: bool = __debug__) -> Litestar:
             health_check,
             websocket_endpoint,
             test_postgres_db,
+            create_user,
         ],
         debug=debug,
     )
