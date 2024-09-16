@@ -23,6 +23,7 @@ sqlalchemy = "^2.0.32"
 alembic = "^1.13.2"
 asyncpg = "^0.29.0"
 greenlet = "^3.0.3"
+structlog = "^24.4.0"
 
 [tool.poetry.group.dev]
 optional = true

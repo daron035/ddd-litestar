@@ -38,13 +38,31 @@ up:
 down:
   docker compose --profile api down
 
-# Up all container
+# Up all containers
 all:
-  docker compose --profile api up --build -d
+  docker compose --profile api \
+    --profile postgres_db \
+    --profile mongo_db \
+    --profile kafka up --build -d
 
-# App logs
+# Dev mod (KAFKA_ADVERTISED_LISTENERS)
+dev:
+  docker compose \
+    --profile postgres_db \
+    --profile mongo_db \
+    --profile kafka up --build -d
+
+# Api logs
 logs:
   docker logs -f litestar.api
+
+# Exec -it api
+api:
+  {{EXEC}} litestar.api sh
+
+# Exec -it postgres
+postgres:
+  {{EXEC}} litestar.postgres psql -U admin -d postgres_db
 
 # Kafka logs
 messaging-logs:
@@ -66,8 +84,8 @@ kafka-setup:
   echo "Topics updated!"
 
 # Alembic migrations
-makemigrations:
-	alembic revision --autogenerate -m="$(m)"
+makemigrations message="$(m)":
+	alembic revision --autogenerate -m="{{message}}"
 
 # Alembic migrate
 migrate:

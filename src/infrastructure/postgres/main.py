@@ -48,7 +48,6 @@ class PostgresManager:
             pool_size=50,
             isolation_level="READ COMMITTED",
         )
-        self.session_factory = async_sessionmaker(bind=self._async_engine, autoflush=False, expire_on_commit=False)
 
         self._read_only_async_engine = create_async_engine(
             self._db_config.full_url,
@@ -64,6 +63,8 @@ class PostgresManager:
             autoflush=False,
             expire_on_commit=False,
         )
+
+        self.session_factory = async_sessionmaker(bind=self._async_engine, autoflush=False, expire_on_commit=False)
 
     @asynccontextmanager
     async def get_session(self) -> AsyncGenerator[AsyncSession, None]:

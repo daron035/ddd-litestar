@@ -5,8 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: development
-      # target: production
+      target: production
+    tty: true
     expose:
       - "8000"
     ports:
@@ -19,7 +19,7 @@ services:
       - litestar.mongo.network
       - litestar.kafka.network
     environment:
-      - CONFIG_PATH=${CONFIG_PATH:-./config/config.toml}
+      - CONFIG_PATH=${CONFIG_PATH:-./config/prod_config.template.toml}
     depends_on:
       kafka:
         condition: service_healthy
@@ -50,9 +50,9 @@ services:
     command: ["python", "-m", "alembic", "upgrade", "head"]
 
   postgres:
-    profiles: ["api", "migration"]
+    profiles: ["postgres_db"]
     container_name: litestar.postgres
-    image: "postgres:16-alpine"
+    image: "postgres:17rc1-alpine"
     hostname: user_service.postgres
     restart: unless-stopped
     expose:
@@ -75,7 +75,7 @@ services:
       start_period: 10s
 
   postgres_backup:
-    profiles: ["api"]
+    profiles: ["postgres_backup"]
     container_name: litestar.postgres_backup
     image: prodrigestivill/postgres-backup-local:15-alpine
     networks:
@@ -93,6 +93,7 @@ services:
       - ${POSTGRES_BACKUP_DIR:-./.backups/postgres}:/backups
 
   pgadmin:
+    profiles: ["postgres_db"]
     container_name: pgadmin4_container
     image: dpage/pgadmin4
     restart: unless-stopped
@@ -105,7 +106,7 @@ services:
       - "5050"
 
   mongodb:
-    profiles: ["api"]
+    profiles: ["mongo_db"]
     container_name: litestar.mongodb
     image: mongo
     ports:
@@ -116,7 +117,7 @@ services:
       - litestar.mongo.network
 
   mongo-express:
-    profiles: ["api"]
+    profiles: ["mongo_db"]
     container_name: litestar.mongo-express
     image: mongo-express
     restart: unless-stopped
@@ -133,7 +134,7 @@ services:
       - mongodb
 
   zookeeper:
-    profiles: ["api", "kafka"]
+    profiles: ["kafka"]
     image: confluentinc/cp-zookeeper:latest
     container_name: main-zookeeper
     environment:
@@ -145,7 +146,7 @@ services:
       - litestar.kafka.network
 
   kafka:
-    profiles: ["api", "kafka"]
+    profiles: ["kafka"]
     image: confluentinc/cp-kafka:latest
     container_name: main-kafka
     depends_on:
@@ -157,6 +158,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092
+      # KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -174,7 +176,7 @@ services:
     #   retries: 10
 
   kafka-ui:
-    profiles: ["api", "kafka"]
+    profiles: ["kafka"]
     image: provectuslabs/kafka-ui
     container_name: kafka-ui
     ports:
@@ -230,6 +232,5 @@ volumes:
 
 networks:
   litestar.postgres.network:
-    driver: bridge
   litestar.mongo.network:
   litestar.kafka.network:

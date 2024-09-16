@@ -37,8 +37,8 @@ class User(AggregateRoot):
         full_name: FullName,
         existing_usernames: set[Username],
     ) -> Self:
-        # TODO: if username in existing_usernames:
-        #     raise UsernameAlreadyExistsError(username.to_raw())
+        if username in existing_usernames:
+            raise UsernameAlreadyExistsError(username.to_raw())
 
         existing_usernames.add(username)
         user = cls(user_id, username, full_name, existing_usernames)

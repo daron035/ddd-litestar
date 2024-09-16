@@ -4,23 +4,24 @@ port = 8000
 debug = true
 
 [mongo]
-mongodb_connection_uri = "mongodb://mongodb:27017"
+mongodb_connection_uri = "mongodb://localhost:27017"
 mongodb_chat_database = "chat"
 mongodb_chat_collection = "chat"
 
 [postgres_db]
-host = "postgres"
-port = 5432
+host = "localhost"
+port = 15432
 database = "postgres_db"
 user = "admin"
 password = "admin"
 echo = true
 
 [event_bus]
-bootstrap_servers = "kafka:29092"
+bootstrap_servers = "localhost:29092"
 group_id = "chat"
 metadata_max_age_ms = 30000
 
 [logging]
 level = "DEBUG"
 render_json_logs = false
+# path = "./logs/logs.log"

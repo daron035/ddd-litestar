@@ -4,8 +4,8 @@ from dataclasses import dataclass
 @dataclass
 class PostgresConfig:
     host: str = "localhost"
-    port: int = 5432
-    database: str = "postgres"
+    port: int = 15432
+    database: str = "postgres_db"
     user: str = "admin"
     password: str = "admin"
     echo: bool = True

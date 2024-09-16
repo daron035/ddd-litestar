@@ -1,3 +1,5 @@
+import logging
+
 from typing import Annotated, Any
 from uuid import UUID
 
@@ -18,6 +20,9 @@ from src.application.user.commands.create_user import CreateUser
 from src.infrastructure.containers import init_container
 from src.infrastructure.mediator.mediator import MediatorImpl
 from src.infrastructure.postgres.services.healthcheck import PgHealthCheck
+
+
+logger = logging.getLogger(__name__)
 
 
 @post(
@@ -99,6 +104,8 @@ async def get_chat_messages(
 
 @get("/books/{book_id:int}")
 async def get_book(book_id: int) -> dict[str, int]:
+    logger.info("Get book", extra={"user": book_id})
+
     return {"book_id": book_id}
 
 

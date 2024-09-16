@@ -1,3 +1,5 @@
+import logging
+
 from functools import lru_cache
 
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
@@ -19,7 +21,11 @@ from src.domain.common.events.event import Event
 from src.infrastructure.config_loader import load_config
 from src.infrastructure.event_bus.event_bus import EventBusImpl
 from src.infrastructure.event_bus.event_handler import EventHandlerPublisher
+from src.infrastructure.mediator.dispatchers.command import CommandDispatcherImpl
+from src.infrastructure.mediator.dispatchers.query import QueryDispatcherImpl
 from src.infrastructure.mediator.mediator import MediatorImpl
+from src.infrastructure.mediator.middlewares.logging import LoggingMiddleware
+from src.infrastructure.mediator.observers.event import EventObserverImpl
 from src.infrastructure.message_broker.interface import MessageBroker
 from src.infrastructure.message_broker.kafka import KafkaMessageBroker
 from src.infrastructure.mongo.repositories.chat import MongoDBChatRepoImpl
@@ -54,7 +60,11 @@ def init_container() -> Container:
 
 
 def _init_mediator(container: Container) -> MediatorImpl:
-    mediator = MediatorImpl()
+    middlewares = (LoggingMiddleware("mediator", level=logging.INFO),)
+    command_dispatcher = CommandDispatcherImpl(middlewares=middlewares)
+    query_dispatcher = QueryDispatcherImpl(middlewares=middlewares)
+    event_observer = EventObserverImpl(middlewares=middlewares)
+    mediator = MediatorImpl(command_dispatcher, query_dispatcher, event_observer)
 
     create_chat_handler = CreateChatHandler(
         chat_repository=container.resolve(ChatRepo),
