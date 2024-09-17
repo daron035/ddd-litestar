@@ -21,7 +21,7 @@ class CreateMessage(Command[Message]):
 class CreateMessageHandler(CommandHandler[CreateMessage, Message]):
     chat_repository: ChatRepo
     message_repository: MessageRepo
-    _mediator: EventMediator
+    mediator: EventMediator
 
     async def __call__(self, command: CreateMessage) -> Message:
         chat: Chat = await self.chat_repository.get_chat_by_id(chat_id=command.chat_id)
@@ -29,6 +29,6 @@ class CreateMessageHandler(CommandHandler[CreateMessage, Message]):
         message = Message(text=Text(value=command.text), chat_id=Id(value=command.chat_id))
         chat.add_message(message)
         await self.message_repository.add_message(message=message)
-        await self._mediator.publish(chat.pull_events())
+        await self.mediator.publish(chat.pull_events())
 
         return message

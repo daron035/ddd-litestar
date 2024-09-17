@@ -68,17 +68,17 @@ def _init_mediator(container: Container) -> MediatorImpl:
 
     create_chat_handler = CreateChatHandler(
         chat_repository=container.resolve(ChatRepo),
-        _mediator=mediator,
+        mediator=mediator,
     )
     create_message_handler = CreateMessageHandler(
         chat_repository=container.resolve(ChatRepo),
         message_repository=container.resolve(MessageRepo),
-        _mediator=mediator,
+        mediator=mediator,
     )
     create_user_handler = CreateUserHandler(
         user_repo=container.resolve(UserRepo),
         uow=container.resolve(UnitOfWork),
-        _mediator=mediator,
+        mediator=mediator,
     )
 
     mediator.register_command_handler(CreateChat, create_chat_handler)

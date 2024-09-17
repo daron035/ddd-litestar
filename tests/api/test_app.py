@@ -2,17 +2,17 @@ import pytest
 
 from litestar import Litestar
 from litestar.status_codes import HTTP_200_OK
-from litestar.testing import TestClient
+from litestar.testing import AsyncTestClient
 
 
-def test_index(test_client: TestClient[Litestar]) -> None:
-    response = test_client.get("/")
+async def test_health_check(test_client: AsyncTestClient[Litestar]) -> None:
+    response = await test_client.get("/healthcheck")
     assert response.status_code == HTTP_200_OK
-    assert response.text == "Hello, world!"
+    assert response.text == "healthy"
 
 
-def test_get_book(test_client: TestClient[Litestar]) -> None:
-    response = test_client.get("/books/1")
+async def test_get_book(test_client: AsyncTestClient[Litestar]) -> None:
+    response = await test_client.get("/books/1")
     assert response.status_code == HTTP_200_OK
     assert response.json() == {"book_id": 1}
 

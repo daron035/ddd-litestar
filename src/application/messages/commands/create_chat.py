@@ -18,7 +18,7 @@ class CreateChat(Command[Chat]):
 @dataclass(frozen=True)
 class CreateChatHandler(CommandHandler[CreateChat, Entity]):
     chat_repository: ChatRepo
-    _mediator: EventMediator
+    mediator: EventMediator
 
     async def __call__(self, command: CreateChat) -> Entity:
         if await self.chat_repository.check_chat_exists_by_title(command.title):
@@ -28,6 +28,6 @@ class CreateChatHandler(CommandHandler[CreateChat, Entity]):
 
         new_chat = Chat.create(title=title)
         await self.chat_repository.add_chat(new_chat)
-        await self._mediator.publish(new_chat.pull_events())
+        await self.mediator.publish(new_chat.pull_events())
 
         return new_chat

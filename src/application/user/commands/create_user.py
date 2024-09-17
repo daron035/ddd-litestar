@@ -28,7 +28,7 @@ class CreateUser(Command[UUID]):
 class CreateUserHandler(CommandHandler[CreateUser, UUID]):
     user_repo: UserRepo
     uow: UnitOfWork
-    _mediator: EventMediator
+    mediator: EventMediator
 
     @close_session
     async def __call__(self, command: CreateUser) -> UUID:
@@ -40,7 +40,7 @@ class CreateUserHandler(CommandHandler[CreateUser, UUID]):
         existing_usernames = {Username("ioqwrue")}
         user = User.create(user_id, username, full_name, existing_usernames)
         await self.user_repo.add_user(user)
-        await self._mediator.publish(user.pull_events())
+        await self.mediator.publish(user.pull_events())
         await self.uow.commit()
 
         logger.info("User created", extra={"user": user})
