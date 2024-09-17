@@ -21,6 +21,7 @@ from src.domain.common.events.event import Event
 from src.infrastructure.config_loader import load_config
 from src.infrastructure.event_bus.event_bus import EventBusImpl
 from src.infrastructure.event_bus.event_handler import EventHandlerPublisher
+from src.infrastructure.log.event_handler import EventLogger
 from src.infrastructure.mediator.dispatchers.command import CommandDispatcherImpl
 from src.infrastructure.mediator.dispatchers.query import QueryDispatcherImpl
 from src.infrastructure.mediator.mediator import MediatorImpl
@@ -92,6 +93,7 @@ def _init_mediator(container: Container) -> MediatorImpl:
     mediator.register_query_handler(GetMessagesByChatId, get_chat_messages_handler)
 
     mediator.register_event_handler(Event, _init_event_handler(container))
+    mediator.register_event_handler(Event, EventLogger)
     mediator.register_event_handler(MessageReceived, _init_message_received_handler(container))
 
     return mediator
