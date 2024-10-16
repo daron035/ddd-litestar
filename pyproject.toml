@@ -25,6 +25,7 @@ greenlet = "^3.0.3"
 structlog = "^24.4.0"
 fastapi = "^0.115.0"
 httpx = "^0.27.2"
+elastic-apm = "^6.23.0"
 
 [tool.poetry.group.dev]
 optional = true

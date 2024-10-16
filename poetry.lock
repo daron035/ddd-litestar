@@ -552,6 +552,46 @@ ssh = ["paramiko (>=2.4.3)"]
 websockets = ["websocket-client (>=1.3.0)"]
 
 [[package]]
+name = "ecs-logging"
+version = "2.2.0"
+description = "Logging formatters for ECS (Elastic Common Schema) in Python"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "ecs_logging-2.2.0-py3-none-any.whl", hash = "sha256:f6e22d267770b06f797076f49b5fcc9d97108b22f452f5f9ed4b5367b1e61b5b"},
+    {file = "ecs_logging-2.2.0.tar.gz", hash = "sha256:1dc9e216f614129db0e6a2f9f926da4e4cf8edf8de16d1045a20aa8e950291d3"},
+]
+
+[package.extras]
+develop = ["elastic-apm", "mock", "pytest", "pytest-cov", "structlog"]
+
+[[package]]
+name = "elastic-apm"
+version = "6.23.0"
+description = "The official Python module for Elastic APM"
+optional = false
+python-versions = "<4,>=3.6"
+files = [
+    {file = "elastic-apm-6.23.0.tar.gz", hash = "sha256:1aeef4562486bd9ad611bba15f9eca5aeede6a737777541cb68c47c6cf5df7d4"},
+    {file = "elastic_apm-6.23.0-py2.py3-none-any.whl", hash = "sha256:5a1a17580560e70fba40b0a2e7682348422de5a9d2d13511efd05646eb4c62ae"},
+]
+
+[package.dependencies]
+certifi = "*"
+ecs-logging = "*"
+urllib3 = "<2.0.0 || >2.0.0,<3.0.0"
+wrapt = ">=1.14.1,<1.15.0 || >1.15.0"
+
+[package.extras]
+aiohttp = ["aiohttp"]
+flask = ["blinker"]
+opentelemetry = ["opentelemetry-api", "opentelemetry-sdk"]
+opentracing = ["opentracing (>=2.0.0)"]
+sanic = ["sanic"]
+starlette = ["starlette"]
+tornado = ["tornado"]
+
+[[package]]
 name = "executing"
 version = "2.0.1"
 description = "Get the currently executing AST node of a frame, and other information"
@@ -2397,4 +2437,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12.4"
-content-hash = "1daf09302cf448a524ba9e95063b2eb47effff24f6e28c302dc739b467d27e3c"
+content-hash = "53a3f5ac111283f1756e8b344824ac9520ebe99ea12eaa23d8340e8dcbc03842"

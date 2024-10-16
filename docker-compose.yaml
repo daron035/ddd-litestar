@@ -18,6 +18,7 @@ services:
       - user_service.postgres.network
       - user_service.mongo.network
       - user_service.kafka.network
+      - user_service.elastic
     environment:
       - CONFIG_PATH=${CONFIG_PATH:-./config/prod_config.template.toml}
     depends_on:
@@ -41,6 +42,7 @@ services:
         condition: service_healthy
     networks:
       - user_service.postgres.network
+      - user_service.elastic
     volumes:
       - ./config:/app/config:ro
       - ./alembic.ini:/app/alembic.ini:ro
@@ -61,6 +63,7 @@ services:
       - "${POSTGRES_PORT}:5432"
     networks:
       - user_service.postgres.network
+      - user_service.elastic
     environment:
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
       POSTGRES_USER: ${POSTGRES_USER:-$USER}
@@ -80,6 +83,7 @@ services:
     image: prodrigestivill/postgres-backup-local:15-alpine
     networks:
       - user_service.postgres.network
+      - user_service.elastic
     environment:
       - POSTGRES_HOST=postgres
       - POSTGRES_DB=${POSTGRES_DB:-$USER}
@@ -115,6 +119,7 @@ services:
       - user_service.mongodb.data:/data/db
     networks:
       - user_service.mongo.network
+      - user_service.elastic
 
   mongo-express:
     profiles: ["mongo_db"]
@@ -125,6 +130,7 @@ services:
       - "28081:8081"
     networks:
       - user_service.mongo.network
+      - user_service.elastic
     environment:
       ME_CONFIG_MONGODB_SERVER: mongodb
       ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_DB_ADMIN_USERNAME}
@@ -226,11 +232,94 @@ services:
   #     - user_service.kafka.network
   #   restart: "no"
 
+  apm-server:
+    profiles: ["elk"]
+    container_name: user_service.apm-server
+    image: elastic/apm-server:7.17.22
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      kibana:
+        condition: service_healthy
+    cap_add: ["CHOWN", "DAC_OVERRIDE", "SETGID", "SETUID"]
+    cap_drop: ["ALL"]
+    ports:
+      - 8200:8200
+    networks:
+      - user_service.elastic
+    command: >
+      apm-server -e
+        -E apm-server.rum.enabled=true
+        -E setup.kibana.host=kibana:5601
+        -E setup.template.settings.index.number_of_replicas=0
+        -E apm-server.kibana.enabled=true
+        -E apm-server.kibana.host=kibana:5601
+        -E output.elasticsearch.hosts=["elasticsearch:9200"]
+    healthcheck:
+      interval: 10s
+      retries: 12
+      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:8200/
+
+  elasticsearch:
+    profiles: ["elk"]
+    container_name: user_service.elasticsearch
+    image: elasticsearch:8.14.1
+    environment:
+      - ELASTIC_PASSWORD=pass
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+      - xpack.security.enrollment.enabled=true
+      # - xpack.security.enrollment.enabled=false
+      - xpack.security.enabled=false
+    # environment:
+    #   - bootstrap.memory_lock=true
+    #   - cluster.name=docker-cluster
+    #   - cluster.routing.allocation.disk.threshold_enabled=false
+    #   - discovery.type=single-node
+    #   - ES_JAVA_OPTS=-XX:UseAVX=2 -Xms1g -Xmx1g
+    ulimits:
+      memlock:
+        hard: -1
+        soft: -1
+    volumes:
+      - user_service.esdata:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - user_service.elastic
+    healthcheck:
+      interval: 20s
+      retries: 10
+      test: curl -s http://localhost:9200/_cluster/health | grep -vq '"status":"red"'
+
+  kibana:
+    profiles: ["elk"]
+    container_name: user_service.kibana
+    image: kibana:8.14.1
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - 5601:5601
+    networks:
+      - user_service.elastic
+    healthcheck:
+      interval: 10s
+      retries: 20
+      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:5601/api/status
+
 volumes:
   user_service.postgres.data:
   user_service.mongodb.data:
+  user_service.esdata:
 
 networks:
   user_service.postgres.network:
   user_service.mongo.network:
   user_service.kafka.network:
+  user_service.elastic:

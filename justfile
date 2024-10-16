@@ -45,6 +45,14 @@ all:
     --profile mongo_db \
     --profile kafka up --build -d
 
+# Up all containers
+elk:
+  docker compose --profile api \
+    --profile postgres_db \
+    --profile mongo_db \
+    --profile elk \
+    --profile kafka up --build -d
+
 # Dev mod (KAFKA_ADVERTISED_LISTENERS)
 dev:
   docker compose \
