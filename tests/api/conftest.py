@@ -1,26 +1,17 @@
-from collections.abc import AsyncIterator
-from typing import TYPE_CHECKING
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
-from litestar import Litestar
-from litestar.testing import AsyncTestClient
-from pytest import fixture
+import pytest
 
-from src.presentation.api.controllers import controllers
 from src.presentation.api.main import init_api
 
 
-if TYPE_CHECKING:
-    from litestar import Litestar
+@pytest.fixture
+def app() -> FastAPI:
+    app = init_api()
+    return app
 
 
-# @fixture()
-def app() -> Litestar:
-    return Litestar(
-        route_handlers=controllers,
-    )
-
-
-@fixture(scope="function")
-async def test_client() -> AsyncIterator[AsyncTestClient[Litestar]]:
-    async with AsyncTestClient(app=app()) as client:
-        yield client
+@pytest.fixture
+def client(app: FastAPI) -> TestClient:
+    return TestClient(app=app)

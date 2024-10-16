@@ -9,7 +9,7 @@ mongodb_chat_database = "chat"
 mongodb_chat_collection = "chat"
 
 [postgres_db]
-host = "litestar.postgres"
+host = "user_service.postgres"
 port = 5432
 database = "postgres_db"
 user = "admin"

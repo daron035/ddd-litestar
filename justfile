@@ -9,10 +9,10 @@ package_dir := "src"
 help:
     just -l
 
-# Litestar run
+# Fastapi run
 run:
   # $(py) python -m {{package_dir}}
-  uvicorn src.presentation.api.main:init_api --reload
+  uvicorn src.presentation.api.main:init_api --reload --factory
 
 # Install package with dependencies
 install:
@@ -54,15 +54,15 @@ dev:
 
 # Api logs
 logs:
-  docker logs -f litestar.api
+  docker logs -f user_service.api
 
 # Exec -it api
 api:
-  {{EXEC}} litestar.api sh
+  {{EXEC}} user_service.api sh
 
 # Exec -it postgres
 postgres:
-  {{EXEC}} litestar.postgres psql -U admin -d postgres_db
+  {{EXEC}} user_service.postgres psql -U admin -d postgres_db
 
 # Kafka logs
 messaging-logs:

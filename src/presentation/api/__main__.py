@@ -16,7 +16,7 @@ async def main() -> None:
 
     logger.info("Launch app", extra={"config": config})
 
-    app = init_api(debug=config.api.debug, log_cfg=config.logging)
+    app = init_api(debug=config.api.debug)
     await run_api(app, config.api)
 
 

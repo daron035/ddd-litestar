@@ -73,13 +73,13 @@ lines-after-imports = 2
 lines-between-types = 1
 
 [lint.isort.sections]
-litestar = ["litestar", "starlette"]
+fastapi = ["fastapi", "starlette"]
 first-party = ["src", "tests"]
 sections = [
     "future",
     "standard-library",
     "third-party",
-    "litestar",
+    "fastapi",
     "first-party",
     "local-folder",
     "testing"

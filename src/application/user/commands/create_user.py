@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from uuid import UUID
 
 from src.application.common.interfaces.uow import UnitOfWork
-from src.application.user.intefraces.persistence.repo import UserRepo
+from src.application.user.interfaces.persistence.repo import UserRepo
 from src.domain.user.entities import User
 from src.domain.user.value_objects import FullName, UserId, Username
 from src.infrastructure.mediator.interface.entities.command import Command
@@ -36,8 +36,7 @@ class CreateUserHandler(CommandHandler[CreateUser, UUID]):
         username = Username(command.username)
         full_name = FullName(command.first_name, command.last_name, command.middle_name)
 
-        # TODO: existing_usernames = await self._user_repo.get_existing_usernames()
-        existing_usernames = {Username("ioqwrue")}
+        existing_usernames = await self.user_repo.get_existing_usernames()
         user = User.create(user_id, username, full_name, existing_usernames)
         await self.user_repo.add_user(user)
         await self.mediator.publish(user.pull_events())

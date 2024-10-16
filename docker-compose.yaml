@@ -1,7 +1,7 @@
 services:
   api:
     profiles: ["api"]
-    container_name: litestar.api
+    container_name: user_service.api
     build:
       context: .
       dockerfile: Dockerfile
@@ -15,9 +15,9 @@ services:
       - ./src:/app/src
       - ./config:/app/config:ro
     networks:
-      - litestar.postgres.network
-      - litestar.mongo.network
-      - litestar.kafka.network
+      - user_service.postgres.network
+      - user_service.mongo.network
+      - user_service.kafka.network
     environment:
       - CONFIG_PATH=${CONFIG_PATH:-./config/prod_config.template.toml}
     depends_on:
@@ -32,7 +32,7 @@ services:
 
   postgres_migration:
     profiles: ["migration"]
-    container_name: litestar.postgres_migration
+    container_name: user_service.postgres_migration
     build:
       context: .
     restart: on-failure
@@ -40,7 +40,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - litestar.postgres.network
+      - user_service.postgres.network
     volumes:
       - ./config:/app/config:ro
       - ./alembic.ini:/app/alembic.ini:ro
@@ -51,7 +51,7 @@ services:
 
   postgres:
     profiles: ["postgres_db"]
-    container_name: litestar.postgres
+    container_name: user_service.postgres
     image: "postgres:17rc1-alpine"
     hostname: user_service.postgres
     restart: unless-stopped
@@ -60,13 +60,13 @@ services:
     ports:
       - "${POSTGRES_PORT}:5432"
     networks:
-      - litestar.postgres.network
+      - user_service.postgres.network
     environment:
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
       POSTGRES_USER: ${POSTGRES_USER:-$USER}
       POSTGRES_DB: ${POSTGRES_DB:-$USER}
     volumes:
-      - litestar.postgres.data:/var/lib/postgresql/data:rw
+      - user_service.postgres.data:/var/lib/postgresql/data:rw
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       interval: 10s
@@ -76,10 +76,10 @@ services:
 
   postgres_backup:
     profiles: ["postgres_backup"]
-    container_name: litestar.postgres_backup
+    container_name: user_service.postgres_backup
     image: prodrigestivill/postgres-backup-local:15-alpine
     networks:
-      - litestar.postgres.network
+      - user_service.postgres.network
     environment:
       - POSTGRES_HOST=postgres
       - POSTGRES_DB=${POSTGRES_DB:-$USER}
@@ -107,24 +107,24 @@ services:
 
   mongodb:
     profiles: ["mongo_db"]
-    container_name: litestar.mongodb
+    container_name: user_service.mongodb
     image: mongo
     ports:
       - "27017:27017"
     volumes:
-      - litestar.mongodb.data:/data/db
+      - user_service.mongodb.data:/data/db
     networks:
-      - litestar.mongo.network
+      - user_service.mongo.network
 
   mongo-express:
     profiles: ["mongo_db"]
-    container_name: litestar.mongo-express
+    container_name: user_service.mongo-express
     image: mongo-express
     restart: unless-stopped
     ports:
       - "28081:8081"
     networks:
-      - litestar.mongo.network
+      - user_service.mongo.network
     environment:
       ME_CONFIG_MONGODB_SERVER: mongodb
       ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_DB_ADMIN_USERNAME}
@@ -143,7 +143,7 @@ services:
     ports:
       - 22181:2181
     networks:
-      - litestar.kafka.network
+      - user_service.kafka.network
 
   kafka:
     profiles: ["kafka"]
@@ -153,17 +153,17 @@ services:
       - zookeeper
     ports:
       - 29092:29092
+      - 9092:9092
     hostname: kafka
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092
-      # KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
-      - litestar.kafka.network
+      - user_service.kafka.network
     healthcheck:
       test: nc -z localhost 29092
       # interval: 10s
@@ -190,7 +190,7 @@ services:
       - kafka
       - zookeeper
     networks:
-      - litestar.kafka.network
+      - user_service.kafka.network
 
   # create-topics:
   #   image: confluentinc/cp-kafka:latest
@@ -208,7 +208,7 @@ services:
   #       kafka-topics --create --topic Message --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka:29092 && \
   #       echo "Topics created!"
   #   networks:
-  #     - litestar.kafka.network
+  #     - user_service.kafka.network
   #   restart: "no"
 
   # create-topics:
@@ -223,14 +223,14 @@ services:
   #     - /bin/sh
   #     - /usr/local/bin/entrypoint.sh
   #   networks:
-  #     - litestar.kafka.network
+  #     - user_service.kafka.network
   #   restart: "no"
 
 volumes:
-  litestar.postgres.data:
-  litestar.mongodb.data:
+  user_service.postgres.data:
+  user_service.mongodb.data:
 
 networks:
-  litestar.postgres.network:
-  litestar.mongo.network:
-  litestar.kafka.network:
+  user_service.postgres.network:
+  user_service.mongo.network:
+  user_service.kafka.network:

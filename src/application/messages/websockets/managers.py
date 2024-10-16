@@ -3,7 +3,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Protocol
 
-from litestar import WebSocket
+from fastapi.websockets import WebSocket
 
 
 @dataclass

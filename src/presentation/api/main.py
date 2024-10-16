@@ -1,48 +1,40 @@
 import logging
 
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-import structlog
 import uvicorn
 
 from aiojobs import Scheduler
-from litestar import Litestar
-from litestar.middleware import DefineMiddleware
-from litestar.types import ASGIApp, Receive, Scope, Send
-from uuid6 import uuid7
+from fastapi import FastAPI
 
 from src.application.messages.events.message_received import MessageReceived
+from src.infrastructure.config_loader import load_config
 from src.infrastructure.containers import init_container
-from src.infrastructure.log.config import LoggingConfig
 from src.infrastructure.log.main import configure_logging
 from src.infrastructure.mediator.mediator import MediatorImpl
 from src.infrastructure.message_broker.factories import KafkaConnectionFactory
 from src.infrastructure.message_broker.interface import MessageBroker
-from src.presentation.api.config import APIConfig
-from src.presentation.api.controllers import controllers
+from src.presentation.api.config import APIConfig, Config
+from src.presentation.api.controllers.main import setup_controllers
+from src.presentation.api.controllers.responses.orjson import ORJSONResponse
+from src.presentation.api.middlewares.main import setup_middlewares
 
 
 logger = logging.getLogger(__name__)
 
 
-def middleware_factory(app: ASGIApp) -> ASGIApp:
-    async def my_middleware(scope: Scope, receive: Receive, send: Send) -> None:
-        with structlog.contextvars.bound_contextvars(request_id=str(uuid7())):
-            await app(scope, receive, send)
-
-    return my_middleware
-
-
 @asynccontextmanager
-async def kafka_connection(app: Litestar) -> AsyncGenerator[None, None]:
+async def lifespan(app: FastAPI) -> AsyncIterator:
     container = init_container()
     broker: KafkaConnectionFactory = container.resolve(MessageBroker)
     await broker.start()
-    try:
-        yield
-    finally:
-        await broker.stop()
+
+    job = await Scheduler().spawn(consume_in_background())
+    yield
+
+    await broker.stop()
+    await job.close()
 
 
 async def consume_in_background() -> None:
@@ -62,27 +54,24 @@ async def consume_in_background() -> None:
         )
 
 
-@asynccontextmanager
-async def background_tasks(app: Litestar) -> AsyncGenerator[None, None]:
-    job = await Scheduler().spawn(consume_in_background())
-    try:
-        yield
-    finally:
-        await job.close()
+def init_api(debug: bool = __debug__) -> FastAPI:
+    config = load_config(Config)
+    configure_logging(config.logging)
 
-
-def init_api(debug: bool = __debug__, log_cfg: LoggingConfig = LoggingConfig()) -> Litestar:
     logger.debug("Initialize API")
-    return Litestar(
-        lifespan=[kafka_connection, background_tasks],
-        route_handlers=controllers,
-        middleware=[DefineMiddleware(middleware_factory)],
-        logging_config=configure_logging(cfg=log_cfg),
+    app = FastAPI(
+        lifespan=lifespan,
         debug=debug,
+        title="User service",
+        version="1.0.0",
+        default_response_class=ORJSONResponse,
     )
+    setup_middlewares(app)
+    setup_controllers(app)
+    return app
 
 
-async def run_api(app: Litestar, api_config: APIConfig) -> None:
+async def run_api(app: FastAPI, api_config: APIConfig) -> None:
     config = uvicorn.Config(
         app,
         host=api_config.host,
@@ -91,4 +80,5 @@ async def run_api(app: Litestar, api_config: APIConfig) -> None:
         log_config=None,
     )
     server = uvicorn.Server(config)
+    logger.info("Running API")
     await server.serve()

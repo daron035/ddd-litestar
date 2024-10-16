@@ -38,7 +38,6 @@ async def build_sa_session(
 class PostgresManager:
     def __init__(self, db_config: PostgresConfig):
         self._db_config = db_config
-
         self._async_engine = create_async_engine(
             self._db_config.full_url,
             echo=True,
@@ -48,7 +47,6 @@ class PostgresManager:
             pool_size=50,
             isolation_level="READ COMMITTED",
         )
-
         self._read_only_async_engine = create_async_engine(
             self._db_config.full_url,
             echo=True,
@@ -63,7 +61,6 @@ class PostgresManager:
             autoflush=False,
             expire_on_commit=False,
         )
-
         self.session_factory = async_sessionmaker(bind=self._async_engine, autoflush=False, expire_on_commit=False)
 
     @asynccontextmanager

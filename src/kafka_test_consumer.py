@@ -6,7 +6,7 @@ from aiokafka import AIOKafkaConsumer
 async def consume():
     consumer = AIOKafkaConsumer(
         "test-topic",
-        bootstrap_servers="kafka:29092",
+        bootstrap_servers="localhost:9092",
         group_id="chat",
     )
 

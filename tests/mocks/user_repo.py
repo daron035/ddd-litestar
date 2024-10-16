@@ -1,5 +1,5 @@
 from src.application.user.exceptions import UserIdNotExistError
-from src.application.user.intefraces.persistence import UserRepo
+from src.application.user.interfaces.persistence import UserRepo
 from src.domain.user import entities
 from src.domain.user.value_objects import UserId, Username
 

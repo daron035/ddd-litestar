@@ -1,19 +1,20 @@
+from fastapi.testclient import TestClient
 import pytest
 
-from litestar import Litestar
-from litestar.status_codes import HTTP_200_OK
-from litestar.testing import AsyncTestClient
 
-
-async def test_health_check(test_client: AsyncTestClient[Litestar]) -> None:
-    response = await test_client.get("/healthcheck")
-    assert response.status_code == HTTP_200_OK
+async def test_health_check(
+    client: TestClient,
+) -> None:
+    response = client.get("/healthcheck")
+    assert response.status_code == 200
     assert response.text == "healthy"
 
 
-async def test_get_book(test_client: AsyncTestClient[Litestar]) -> None:
-    response = await test_client.get("/books/1")
-    assert response.status_code == HTTP_200_OK
+async def test_get_book(
+    client: TestClient,
+) -> None:
+    response = client.get("/books/1")
+    assert response.status_code == 200
     assert response.json() == {"book_id": 1}
 
 

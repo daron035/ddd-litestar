@@ -1,11 +1,8 @@
 from uuid import UUID
 
-import pytest
 
 from src.application.user.commands import CreateUser, CreateUserHandler
-from src.domain.user.entities import User
 from src.domain.user.events import UserCreated
-from src.domain.user.exceptions import UsernameAlreadyExistsError
 from src.domain.user.value_objects import FullName, UserId, Username
 from src.domain.user.value_objects.deleted_status import DeletionTime
 from tests.mocks import EventMediatorMock, UserRepoMock

@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 
-from src.application.messages.exceptions import ChatWithThatTitleAlreadyExistsError
 from src.application.messages.interfaces.percistence.chat import ChatRepo
-from src.domain.common.entities.entity import Entity
 from src.domain.messages.entities.messages import Chat
 from src.domain.messages.value_objects import Title
 from src.infrastructure.mediator.interface.entities.command import Command
@@ -16,13 +14,13 @@ class CreateChat(Command[Chat]):
 
 
 @dataclass(frozen=True)
-class CreateChatHandler(CommandHandler[CreateChat, Entity]):
+class CreateChatHandler(CommandHandler[CreateChat, Chat]):
     chat_repository: ChatRepo
     mediator: EventMediator
 
-    async def __call__(self, command: CreateChat) -> Entity:
-        if await self.chat_repository.check_chat_exists_by_title(command.title):
-            raise ChatWithThatTitleAlreadyExistsError(command.title)
+    async def __call__(self, command: CreateChat) -> Chat:
+        # if await self.chat_repository.check_chat_exists_by_title(command.title):
+        #     raise ChatWithThatTitleAlreadyExistsError(command.title)
 
         title = Title(value=command.title)
 
