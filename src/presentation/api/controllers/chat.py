@@ -13,11 +13,10 @@ from src.application.messages.queries.get_messages_by_chat import GetMessagesByC
 from src.domain.messages.value_objects.text import EmptyTextError, TooLongTextError
 from src.infrastructure.containers import init_container
 from src.infrastructure.mediator.mediator import MediatorImpl
-from src.presentation.api.controllers.responses.base import ErrorResponse, OkResponse
+from src.presentation.api.controllers.responses.base import ErrorResponse
 
 
 logger = logging.getLogger(__name__)
-
 
 
 chat_router = APIRouter(
@@ -33,11 +32,12 @@ chat_router = APIRouter(
 async def create_chat(
     data: CreateChat,
     container: Container = Depends(init_container),
-) -> OkResponse[UUID]:
+) -> dict:
     mediator: MediatorImpl = container.resolve(MediatorImpl)
     chat = await mediator.send(data)
 
-    return OkResponse(result=chat.id.to_raw())
+    return {"chat_id": chat.id.to_raw()}
+
 
 from src.application.messages import dto
 
@@ -53,16 +53,12 @@ from src.application.messages import dto
     },
     status_code=status.HTTP_201_CREATED,
 )
-async def create_message(
-    data: str,
-    chat_id: UUID,
-    container: Container = Depends(init_container)
-) -> OkResponse[dto.Message]:
+async def create_message(data: str, chat_id: UUID, container: Container = Depends(init_container)) -> dto.Message:
     mediator: MediatorImpl = container.resolve(MediatorImpl)
     message = await mediator.send(CreateMessage(text=data, chat_id=chat_id))
     message_dto = dto.Message.from_entity(message)
 
-    return OkResponse(result=message_dto)
+    return message_dto
 
 
 @chat_router.get(
@@ -74,7 +70,7 @@ async def get_chat_messages(
     limit: Annotated[int, Query(ge=1, le=1000)] = 1000,
     order: SortOrder = SortOrder.ASC,
     container: Container = Depends(init_container),
-) -> OkResponse[dto.Messages]:
+) -> dto.Messages:
     mediator: MediatorImpl = container.resolve(MediatorImpl)
 
     messages = await mediator.query(
@@ -88,5 +84,4 @@ async def get_chat_messages(
         ),
     )
 
-
-    return OkResponse(result=messages)
+    return messages

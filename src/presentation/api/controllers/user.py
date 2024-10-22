@@ -12,7 +12,6 @@ from src.domain.user.value_objects.username import EmptyUsernameError, TooLongUs
 from src.infrastructure.containers import init_container
 from src.infrastructure.mediator.mediator import MediatorImpl
 from src.presentation.api.controllers.responses import ErrorResponse
-from src.presentation.api.controllers.responses.base import OkResponse
 
 
 logger = logging.getLogger(__name__)
@@ -41,10 +40,8 @@ user_router = APIRouter(
 async def create_user(
     data: CreateUser,
     container: Container = Depends(init_container),
-) -> OkResponse[dto.UserDTOs]:
+) -> dto.UserDTOs:
     mediator: MediatorImpl = container.resolve(MediatorImpl)
     user_id = await mediator.send(data)
     user = await mediator.query(GetUserById(user_id=user_id))
-    return OkResponse(result=user)
-
-
+    return user
