@@ -23,14 +23,3 @@ def exception_mapper(
             raise RepoError from err
 
     return wrapped
-
-
-def close_session(func: Func) -> Func:
-    @wraps(func)
-    async def wrapper(self: Any, *args: Param.args, **kwargs: Param.kwargs) -> object:
-        try:
-            return await func(self, *args, **kwargs)
-        finally:
-            await self.uow.close()
-
-    return wrapper

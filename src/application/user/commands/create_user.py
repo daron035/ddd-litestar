@@ -10,7 +10,6 @@ from src.domain.user.value_objects import FullName, UserId, Username
 from src.infrastructure.mediator.interface.entities.command import Command
 from src.infrastructure.mediator.interface.handlers.command import CommandHandler
 from src.infrastructure.mediator.interface.mediator import EventMediator
-from src.infrastructure.postgres.utility_wrappers import close_session
 
 
 logger = logging.getLogger(__name__)
@@ -30,7 +29,6 @@ class CreateUserHandler(CommandHandler[CreateUser, UUID]):
     uow: UnitOfWork
     mediator: EventMediator
 
-    @close_session
     async def __call__(self, command: CreateUser) -> UUID:
         user_id = UserId()
         username = Username(command.username)
