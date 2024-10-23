@@ -11,8 +11,7 @@ help:
 
 # Fastapi run
 run:
-  # $(py) python -m {{package_dir}}
-  uvicorn src.presentation.api.main:init_api --reload --factory
+  python -Om src
 
 # Install package with dependencies
 install:

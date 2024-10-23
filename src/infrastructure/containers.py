@@ -7,6 +7,7 @@ from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from motor.motor_asyncio import AsyncIOMotorClient
 from punq import Container, Scope
 
+from src.application.common.interfaces.outbox import OutboxRepo
 from src.application.common.interfaces.uow import UnitOfWork
 from src.application.messages.commands.create_chat import CreateChat, CreateChatHandler
 from src.application.messages.commands.create_message import CreateMessage, CreateMessageHandler
@@ -21,7 +22,7 @@ from src.application.user.interfaces.persistence import UserReader, UserRepo
 from src.application.user.interfaces.persistence.repo import UserRepo
 from src.application.user.queries.get_user_by_id import GetUserById, GetUserByIdHandler
 from src.domain.common.events.event import Event
-from src.infrastructure.config_loader import load_config
+from src.infrastructure.config import config as _config
 from src.infrastructure.event_bus.event_bus import EventBusImpl
 from src.infrastructure.event_bus.event_handler import EventHandlerPublisher
 from src.infrastructure.log.event_handler import EventLogger
@@ -37,6 +38,7 @@ from src.infrastructure.mongo.config import MongoConfig
 from src.infrastructure.mongo.repositories.chat import MongoDBChatRepoImpl
 from src.infrastructure.mongo.repositories.message import MongoDBMessageReaderImpl, MongoDBMessageRepoImpl
 from src.infrastructure.postgres.main import PostgresManager
+from src.infrastructure.postgres.repositories.outbox import OutboxRepoImpl
 from src.infrastructure.postgres.repositories.user import UserReaderImpl, UserRepoImpl
 from src.infrastructure.postgres.services.healthcheck import PgHealthCheck, PostgresHealthcheckService
 from src.infrastructure.postgres.uow import SQLAlchemyUoW
@@ -46,7 +48,6 @@ from src.presentation.api.config import Config
 
 @lru_cache(maxsize=1)
 def init_container() -> Container:
-    _config = load_config(Config)
     container = Container()
 
     register_brokers(container, _config)
@@ -93,6 +94,7 @@ def _init_mediator(container: Container) -> MediatorImpl:
         user_repo=container.resolve(UserRepo),
         uow=container.resolve(UnitOfWork),
         mediator=mediator,
+        outbox_repo=container.resolve(OutboxRepo),
     )
 
     mediator.register_command_handler(CreateChat, create_chat_handler)
@@ -182,3 +184,4 @@ def _db_factories(container: Container, config: Config) -> None:
     container.register(UnitOfWork, factory=lambda: build_uow(SQLAlchemyUoW(session)))
     container.register(UserRepo, factory=lambda: UserRepoImpl(session))
     container.register(UserReader, factory=lambda: UserReaderImpl(read_only_session))
+    container.register(OutboxRepo, factory=lambda: OutboxRepoImpl(session))

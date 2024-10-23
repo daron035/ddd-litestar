@@ -5,6 +5,8 @@ from typing import TypeVar
 
 from adaptix import Retort
 
+from src.presentation.api.config import Config
+
 
 T = TypeVar("T")
 DEFAULT_CONFIG_PATH = "./config/config.template.toml"
@@ -28,3 +30,6 @@ def load_config(config_type: type[T], config_scope: str | None = None, path: str
     config = dcf.load(data, config_type)
 
     return config
+
+
+config = load_config(Config)

@@ -3,6 +3,7 @@ import logging
 from dataclasses import dataclass
 from uuid import UUID
 
+from src.application.common.interfaces.outbox import OutboxRepo
 from src.application.common.interfaces.uow import UnitOfWork
 from src.application.user.interfaces.persistence.repo import UserRepo
 from src.domain.user.entities import User
@@ -28,6 +29,7 @@ class CreateUserHandler(CommandHandler[CreateUser, UUID]):
     user_repo: UserRepo
     uow: UnitOfWork
     mediator: EventMediator
+    outbox_repo: OutboxRepo
 
     async def __call__(self, command: CreateUser) -> UUID:
         user_id = UserId()
@@ -37,7 +39,7 @@ class CreateUserHandler(CommandHandler[CreateUser, UUID]):
         existing_usernames = await self.user_repo.get_existing_usernames()
         user = User.create(user_id, username, full_name, existing_usernames)
         await self.user_repo.add_user(user)
-        await self.mediator.publish(user.pull_events())
+        await self.outbox_repo.save(user.pull_events())
         await self.uow.commit()
 
         logger.info("User created", extra={"user": user})

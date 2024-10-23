@@ -1,14 +1,19 @@
+from dataclasses import asdict
 from datetime import datetime
-from typing import cast
+from typing import Any, cast
+
+import orjson
 
 from src.application.common.exceptions import MappingError
 from src.application.user import dto
+from src.domain.common.events.event import Event
 from src.domain.user import (
     entities,
     value_objects as vo,
 )
 from src.domain.user.value_objects import Username
 from src.domain.user.value_objects.deleted_status import DeletionTime
+from src.infrastructure.event_bus.event_bus import serialize_event
 from src.infrastructure.postgres import models
 
 
@@ -72,3 +77,26 @@ def convert_db_model_to_user_dto(user: models.User) -> dto.UserDTOs:
             return convert_db_model_to_deleted_user_dto(user)
         case _:
             raise MappingError(f"User {user} is invalid")
+
+
+def convert_events_to_outbox_db_model(event: Event | list[Event]) -> list[models.Outbox]:
+    if isinstance(event, list):
+        ev = [convert_single_event(e) for e in event]
+    else:
+        ev = [convert_single_event(event)]
+    return ev
+
+
+def convert_single_event(event: Event) -> models.Outbox:
+    return models.Outbox(
+        id=event.event_id,
+        occurred_on=event.event_timestamp,
+        type=event.__class__.__name__,
+        data=serialize_event_data_sql(event),
+    )
+
+
+def serialize_event_data_sql(event: Any) -> Any:
+    event_dict = asdict(event)
+    serialized_event = orjson.dumps({k: serialize_event(v) for k, v in event_dict.items()}).decode("utf-8")
+    return serialized_event

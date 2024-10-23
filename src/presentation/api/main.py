@@ -9,13 +9,13 @@ from aiojobs import Scheduler
 from fastapi import FastAPI
 
 from src.application.messages.events.message_received import MessageReceived
-from src.infrastructure.config_loader import load_config
+from src.infrastructure.config import config
 from src.infrastructure.containers import init_container
 from src.infrastructure.log.main import configure_logging
 from src.infrastructure.mediator.mediator import MediatorImpl
 from src.infrastructure.message_broker.factories import KafkaConnectionFactory
 from src.infrastructure.message_broker.interface import MessageBroker
-from src.presentation.api.config import APIConfig, Config
+from src.presentation.api.config import APIConfig
 from src.presentation.api.controllers.main import setup_controllers
 from src.presentation.api.controllers.responses.orjson import ORJSONResponse
 from src.presentation.api.middlewares.main import setup_middlewares
@@ -54,14 +54,13 @@ async def consume_in_background() -> None:
         )
 
 
-def init_api(debug: bool = __debug__) -> FastAPI:
-    config = load_config(Config)
+def init_api() -> FastAPI:
     configure_logging(config.logging)
 
     logger.debug("Initialize API")
     app = FastAPI(
-        lifespan=lifespan,
-        debug=debug,
+        # lifespan=lifespan,
+        debug=config.api.debug,
         title="User service",
         version="1.0.0",
         default_response_class=ORJSONResponse,

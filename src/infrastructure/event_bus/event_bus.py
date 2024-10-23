@@ -5,9 +5,10 @@ from uuid import UUID
 
 import orjson
 
-from src.infrastructure.event_bus.events.base import IntegrationEvent
 from src.infrastructure.message_broker.interface import MessageBroker
 from src.infrastructure.message_broker.message import Message
+
+from .events.base import IntegrationEvent
 
 
 @dataclass
@@ -40,7 +41,7 @@ def serialize_event_data(event: Any) -> bytes:
     return serialized_event
 
 
-def serialize_event(obj: Any) -> Any:  # noqa: PLR0911
+def serialize_event(obj: Any) -> Any:  # noqa
     if isinstance(obj, UUID):
         return str(obj)
     if isinstance(obj, datetime):
