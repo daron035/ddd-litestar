@@ -1,7 +1,7 @@
 import asyncio
 
-from src.presentation.api.__main__ import main as run_app
+from src.presentation.api.__main__ import main
 
 
 def start_uvicorn():  # noqa
-    asyncio.run(run_app())
+    asyncio.run(main())

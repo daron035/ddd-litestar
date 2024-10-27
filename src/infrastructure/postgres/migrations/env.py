@@ -6,7 +6,7 @@ from sqlalchemy import engine_from_config, pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from src.infrastructure.config_loader import load_config
+from src.infrastructure.config import load_config
 from src.infrastructure.postgres import PostgresConfig
 from src.infrastructure.postgres.models.base import BaseModel
 
